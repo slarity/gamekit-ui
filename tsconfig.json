@@ -1,0 +1,3 @@
+{
+  "extends": "@gamekitui/config/tsconfig.base.json"
+}
