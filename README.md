@@ -1,38 +1,66 @@
-# GameKit UI
+<div align="center">
 
-> Drop-in browser games for shadcn. Minimal, themeable React/TSX games installable with the shadcn CLI — perfect for 404 pages, empty states, loading screens, and landing-page easter eggs.
+<a href="https://gamekitui.com">
+  <img src="./.github/og-image.png" alt="GameKit UI — Drop-in browser games for shadcn" width="100%" />
+</a>
+
+<h1>GameKit UI</h1>
+
+<p><strong>Drop-in browser games for shadcn.</strong><br/>
+Minimal, themeable React/TSX games installable with the shadcn CLI — perfect for 404 pages, empty states, loading screens, and landing-page easter eggs.</p>
+
+<p>
+  <a href="https://github.com/slarity/gamekit-ui/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-57f2a4.svg" /></a>
+  <a href="https://github.com/slarity/gamekit-ui/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/slarity/gamekit-ui?color=57f2a4&logo=github" /></a>
+  <img alt="Games" src="https://img.shields.io/badge/games-10-57f2a4.svg" />
+  <img alt="Dependencies" src="https://img.shields.io/badge/deps-zero-57f2a4.svg" />
+  <img alt="Size" src="https://img.shields.io/badge/each_game-%E2%89%A46%20KB-57f2a4.svg" />
+  <a href="https://github.com/slarity/gamekit-ui/blob/main/CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-57f2a4.svg" /></a>
+</p>
+
+<p>
+  <a href="https://gamekitui.com"><b>Website</b></a> ·
+  <a href="https://gamekitui.com/games"><b>Games</b></a> ·
+  <a href="https://gamekitui.com/docs"><b>Docs</b></a> ·
+  <a href="https://github.com/slarity/gamekit-ui/blob/main/CONTRIBUTING.md"><b>Contributing</b></a> ·
+  <a href="https://github.com/slarity/gamekit-ui/issues/new"><b>Report a bug</b></a>
+</p>
+
+</div>
+
+---
 
 ```bash
 npx shadcn@latest add https://gamekitui.com/r/snake.json
 ```
 
-No provider. No peer deps. No init step. Each game is a single drop-in file that **inherits your shadcn theme** automatically (light/dark and any preset).
+No provider. No peer deps. No init step. Each game is a single drop-in file that **inherits your shadcn theme** automatically — light/dark and any preset. Drop one on a 404 and it plays on the first keypress.
 
-## The lineup
+## ✨ Highlights
+
+- **🪶 Minimal** — each game is a single file with zero npm dependencies beyond `react` and your existing `cn` helper. ≤6&nbsp;KB gzipped.
+- **🎨 Themeable** — your `--primary` / `--secondary` / `--accent` drive the *playfield*, not just the chrome. Canvas games read the tokens at runtime; DOM games use Tailwind token classes. Change your theme and the games recolor live.
+- **🚫 Zero assets** — no images, audio, or fonts. Every pixel is drawn with CSS or `<canvas>`.
+- **♿ Accessible** — keyboard + touch input, visible focus rings, `aria-live` announcements, and `prefers-reduced-motion` support in every game.
+
+## 🕹️ The lineup
 
 | Game | Surface | Install |
 |---|---|---|
-| Snake | canvas | `…/r/snake.json` |
-| Tic-Tac-Toe | DOM | `…/r/tic-tac-toe.json` |
-| 2048 | DOM | `…/r/2048.json` |
-| Memory Match | DOM | `…/r/memory-match.json` |
-| Whack-a-Mole | DOM | `…/r/whack-a-mole.json` |
-| Minesweeper | DOM | `…/r/minesweeper.json` |
-| Pong | canvas | `…/r/pong.json` |
-| Breakout | canvas | `…/r/breakout.json` |
-| Dino Runner | canvas | `…/r/dino-runner.json` |
-| Flappy | canvas | `…/r/flappy.json` |
+| 🐍 Snake | canvas | `npx shadcn@latest add https://gamekitui.com/r/snake.json` |
+| ⭕ Tic-Tac-Toe | DOM | `npx shadcn@latest add https://gamekitui.com/r/tic-tac-toe.json` |
+| 🔢 2048 | DOM | `npx shadcn@latest add https://gamekitui.com/r/2048.json` |
+| 🃏 Memory Match | DOM | `npx shadcn@latest add https://gamekitui.com/r/memory-match.json` |
+| 🔨 Whack-a-Mole | DOM | `npx shadcn@latest add https://gamekitui.com/r/whack-a-mole.json` |
+| 💣 Minesweeper | DOM | `npx shadcn@latest add https://gamekitui.com/r/minesweeper.json` |
+| 🏓 Pong | canvas | `npx shadcn@latest add https://gamekitui.com/r/pong.json` |
+| 🧱 Breakout | canvas | `npx shadcn@latest add https://gamekitui.com/r/breakout.json` |
+| 🦖 Dino Runner | canvas | `npx shadcn@latest add https://gamekitui.com/r/dino-runner.json` |
+| 🐦 Flappy | canvas | `npx shadcn@latest add https://gamekitui.com/r/flappy.json` |
 
-Base URL: `https://gamekitui.com`
+> Base registry URL: `https://gamekitui.com/r/{name}.json`
 
-## Principles
-
-- **Minimal** — each game is a single file with zero npm dependencies beyond `react` and your existing `cn` helper.
-- **Themeable** — the theme's `--primary` / `--secondary` / `--accent` drive the *playfield*, not just the chrome. Canvas games read the tokens at runtime; DOM games use Tailwind token classes. Change your theme and the games recolor.
-- **Zero assets** — no images, audio, or fonts. Every pixel is drawn with CSS or `<canvas>`.
-- **Accessible** — keyboard + touch input, visible focus rings, `aria-live` announcements, and `prefers-reduced-motion` support in every game.
-
-## Usage
+## 🚀 Usage
 
 ```tsx
 // app/not-found.tsx
@@ -51,6 +79,8 @@ export default function NotFound() {
 }
 ```
 
+That's it — no setup. On a single-game page like this, the game captures keyboard input globally, so it responds the moment a visitor presses a key (no click-to-focus needed).
+
 ### Namespace install (optional)
 
 Register the `@gamekit` namespace in your `components.json`:
@@ -67,7 +97,7 @@ Register the `@gamekit` namespace in your `components.json`:
 npx shadcn@latest add @gamekit/snake
 ```
 
-## Shared props
+## ⚙️ Shared props
 
 Every game accepts a common subset of props:
 
@@ -76,12 +106,13 @@ Every game accepts a common subset of props:
 | `className` | `string` | Tailwind classes on the wrapper. |
 | `width` / `height` | `number` | Logical size in CSS px (canvas games scale via DPR). |
 | `paused` | `boolean` | Externally pause the game. |
-| `autoFocus` | `boolean` | Focus on mount so keyboard input works. |
+| `autoFocus` | `boolean` | Focus on mount. Defaults to `true`. |
+| `captureGlobalKeys` | `boolean` | Listen for keys on `window` so the game works without being focused first. Defaults to `true` — set `false` when several games share a page, or the game sits in scrollable content, so it only responds while focused. |
 | `persistHighScore` | `boolean \| string` | localStorage key, or a default per game. |
 | `onScoreChange` | `(score: number) => void` | Fires when the score changes. |
 | `onGameOver` | `(r: { score: number; won: boolean }) => void` | Fires on game over. |
 
-## Repository layout
+## 🗂️ Repository layout
 
 ```
 apps/web                  Next.js 16 marketing + docs site; serves /r/*.json
@@ -91,7 +122,7 @@ packages/ui               shadcn primitives used by the site
 scripts/build-registry.ts Emits apps/web/public/r/*.json from the game sources
 ```
 
-## Development
+## 🛠️ Development
 
 ```bash
 bun install
@@ -106,14 +137,20 @@ bun run check-types    # typecheck every workspace
 cd packages/registry && bun smoke.tsx   # render smoke test for every game
 ```
 
-## Contributing
+## 🤝 Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the "add a new game" guide (engine/wrapper template, the shared props contract, the theme-token mapping, and the size budget).
+Contributions are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the "add a new game" guide — the engine/wrapper template, the shared props contract, the theme-token mapping, and the size budget. Please also review our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-## Disclaimer
+Found a bug or have an idea? [Open an issue](https://github.com/slarity/gamekit-ui/issues/new).
+
+## ⚠️ Disclaimer
 
 **GameKit UI** is an independent, unaffiliated community project. It is not built, sponsored, or endorsed by the shadcn/ui team. It uses the shadcn registry system. The `shadcn-` prefix is reserved for official projects, which is why this project is named `gamekitui` (not `shadcn-games`).
 
-## License
+## 📄 License
 
-[MIT](./LICENSE)
+[MIT](./LICENSE) © GameKit UI contributors
+
+<div align="center">
+<sub>Built with ❤️ for the shadcn community.</sub>
+</div>

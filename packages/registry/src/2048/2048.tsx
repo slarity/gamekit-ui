@@ -266,6 +266,14 @@ export interface Game2048Props {
   /** Optional max-width override (e.g. "320px", "24rem"). Defaults to max-w-sm. */
   width?: string;
   autoFocus?: boolean;
+  /**
+   * When true (the default), the game listens for keys on `window` so it works
+   * without being focused first — ideal for single-game pages (404s, loading /
+   * empty states). Set false when multiple games share a page, or the game sits
+   * in scrollable content, so it only responds while focused. Ignores keys aimed
+   * at form fields.
+   */
+  captureGlobalKeys?: boolean;
   persistHighScore?: boolean | string;
   onScoreChange?: (score: number) => void;
   onGameOver?: (r: { score: number; won: boolean }) => void;
@@ -276,6 +284,7 @@ export function Game2048({
   className,
   width,
   autoFocus = true,
+  captureGlobalKeys = true,
   persistHighScore = true,
   onScoreChange,
   onGameOver,
@@ -399,9 +408,10 @@ export function Game2048({
 
   // Keyboard handler on the wrapper (not window).
   React.useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
     const onKey = (e: KeyboardEvent) => {
+      // In global mode, ignore keys aimed at form fields / editable content.
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
       const dirMap: Record<string, Dir> = {
         ArrowUp: "up",
         ArrowDown: "down",
@@ -429,9 +439,16 @@ export function Game2048({
         if (statusRef.current !== "playing") startGame();
       }
     };
-    el.addEventListener("keydown", onKey);
-    return () => el.removeEventListener("keydown", onKey);
-  }, [startGame, move]);
+    // Single-game pages can opt into window-level capture so keys work without
+    // focusing the game; otherwise listen on the wrapper (focus-scoped).
+    const target: Window | HTMLElement | null = captureGlobalKeys
+      ? window
+      : wrapperRef.current;
+    target?.addEventListener("keydown", onKey as EventListener);
+    return () => {
+      target?.removeEventListener("keydown", onKey as EventListener);
+    };
+  }, [startGame, move, captureGlobalKeys]);
 
   // Touch swipe (same approach as snake.tsx).
   React.useEffect(() => {
@@ -482,7 +499,9 @@ export function Game2048({
       style={width ? { maxWidth: width } : undefined}
       className={cn(
         "relative flex w-full max-w-sm select-none flex-col gap-2 outline-none",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        // Focus ring only matters when keys are focus-scoped; global capture hides it.
+        !captureGlobalKeys &&
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
     >

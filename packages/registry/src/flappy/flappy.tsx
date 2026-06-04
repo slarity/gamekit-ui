@@ -107,6 +107,14 @@ export interface FlappyProps {
   height?: number;
   paused?: boolean;
   autoFocus?: boolean;
+  /**
+   * When true (the default), the game listens for keys on `window` so it works
+   * without being focused first — ideal for single-game pages (404s, loading /
+   * empty states). Set false when multiple games share a page, or the game sits
+   * in scrollable content, so it only responds while focused. Ignores keys aimed
+   * at form fields.
+   */
+  captureGlobalKeys?: boolean;
   persistHighScore?: boolean | string;
   onScoreChange?: (score: number) => void;
   onGameOver?: (r: { score: number; won: boolean }) => void;
@@ -118,6 +126,7 @@ export function Flappy({
   width,
   paused = false,
   autoFocus = true,
+  captureGlobalKeys = true,
   persistHighScore = true,
   onScoreChange,
   onGameOver,
@@ -463,6 +472,9 @@ export function Flappy({
   // Keyboard handling
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // In global mode, ignore keys aimed at form fields / editable content.
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
       if (e.key === " " || e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
         e.preventDefault();
         flap();
@@ -471,10 +483,16 @@ export function Flappy({
         if (statusRef.current !== "playing") flap();
       }
     };
-    const el = wrapperRef.current;
-    el?.addEventListener("keydown", onKey);
-    return () => el?.removeEventListener("keydown", onKey);
-  }, [flap]);
+    // Single-game pages can opt into window-level capture so keys work without
+    // focusing the game; otherwise listen on the wrapper (focus-scoped).
+    const target: Window | HTMLElement | null = captureGlobalKeys
+      ? window
+      : wrapperRef.current;
+    target?.addEventListener("keydown", onKey as EventListener);
+    return () => {
+      target?.removeEventListener("keydown", onKey as EventListener);
+    };
+  }, [flap, captureGlobalKeys]);
 
   // Touch / click — tap/click anywhere on canvas flaps
   React.useEffect(() => {
@@ -506,7 +524,9 @@ export function Flappy({
       style={width ? { maxWidth: width } : undefined}
       className={cn(
         "relative flex w-full select-none flex-col gap-2 outline-none",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        // Focus ring only matters when keys are focus-scoped; global capture hides it.
+        !captureGlobalKeys &&
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
     >
