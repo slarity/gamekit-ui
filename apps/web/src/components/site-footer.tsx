@@ -12,7 +12,7 @@ export function SiteFooter() {
             <BrandWordmark />
           </Link>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Tiny, themeable browser games for shadcn. ≤6&nbsp;KB each, zero external assets.
+            Tiny, themeable browser games for shadcn. 2–4&nbsp;KB gzipped, zero external assets.
           </p>
         </div>
         <div className="flex gap-8 font-mono text-sm">

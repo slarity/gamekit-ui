@@ -17,7 +17,7 @@ export function GET() {
 
 > ${siteConfig.description}
 
-${siteConfig.name} is a shadcn registry. Each game is a single drop-in React/TSX file installed with the shadcn CLI. There is no provider, no peer dependency, and no init step — a game fills its container and inherits the host app's shadcn theme (light/dark and any preset). Games are zero-asset (drawn with CSS or <canvas>) and ≤6 KB gzipped each.
+${siteConfig.name} is a shadcn registry. Each game is a single drop-in React/TSX file installed with the shadcn CLI. There is no provider, no peer dependency, and no init step — a game fills its container and inherits the host app's shadcn theme (light/dark and any preset). Games are zero-asset (drawn with CSS or <canvas>) and 2–4 KB each minified + gzipped (the raw source file is larger because it inlines its engine and theme hooks). Each game is a self-contained module, so it can be lazy-loaded (React.lazy / next/dynamic) and stays out of the initial bundle.
 
 ## Install a game
 

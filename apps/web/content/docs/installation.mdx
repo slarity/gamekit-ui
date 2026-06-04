@@ -48,6 +48,21 @@ export default function NotFound() {
 }
 ```
 
+## Bundle size & lazy-loading
+
+The installed `.tsx` looks large (~15–28 KB) because each game inlines its own engine and theme hooks to stay a true single-file drop-in — but that's the **source**, not what ships. Built for production, every game is **2–4 KB minified + gzipped**.
+
+Each game is a self-contained module, so it's trivially code-split. Lazy-load it and it never touches your initial bundle — it only downloads when the easter egg actually renders:
+
+```tsx
+import dynamic from "next/dynamic";
+
+const Snake = dynamic(() => import("@/components/games/snake").then((m) => m.Snake), {
+  ssr: false,
+  loading: () => <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />,
+});
+```
+
 ## Shared props
 
 Every game accepts a common subset of props:
@@ -57,7 +72,8 @@ Every game accepts a common subset of props:
 | `className` | `string` | Tailwind classes on the wrapper. |
 | `width` / `height` | `number` | Logical size in CSS px (canvas games scale via DPR). |
 | `paused` | `boolean` | Externally pause the game. |
-| `autoFocus` | `boolean` | Focus on mount so keyboard input works. |
+| `autoFocus` | `boolean` | Focus on mount. Defaults to `true`. |
+| `captureGlobalKeys` | `boolean` | Listen for keys on `window` so the game works without being focused first. Defaults to `true` — set `false` when several games share a page, or it sits in scrollable content, so it only responds while focused. |
 | `persistHighScore` | `boolean \| string` | localStorage key, or a default per game. |
 | `onScoreChange` | `(score: number) => void` | Fires when the score changes. |
 | `onGameOver` | `(r: { score: number; won: boolean }) => void` | Fires on game over. |

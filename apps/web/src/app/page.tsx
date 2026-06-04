@@ -17,7 +17,7 @@ const PILLARS = [
   {
     icon: Package,
     title: "Minimal",
-    body: "Each game is ≤6 KB gzipped — a single drop-in file with zero npm dependencies.",
+    body: "A single drop-in file — 2–4 KB minified + gzipped, zero npm dependencies. Lazy-load it and it stays out of your initial bundle.",
   },
   {
     icon: Palette,
@@ -54,7 +54,10 @@ export default function Home() {
                   shadcn registry
                 </Badge>
                 <Badge variant="outline" className="font-mono font-normal text-muted-foreground">
-                  zero deps · ≤6 KB
+                  zero deps
+                </Badge>
+                <Badge variant="outline" className="font-mono font-normal text-muted-foreground">
+                  ≤6 KB gzipped
                 </Badge>
               </div>
 

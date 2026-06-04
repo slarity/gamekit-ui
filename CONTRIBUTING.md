@@ -64,7 +64,13 @@ Build start/restart/score/overlay UI from plain elements + Tailwind token utilit
 
 ## Size budget
 
-Each game must stay **≤ 6 KB gzipped** (the library ≤ 60 KB). Keep logic tight, inline only what you need, and avoid abstractions that don't earn their bytes.
+Each game must stay **≤ 6 KB minified + gzipped** — the production size, not the raw `.tsx` (which is larger because it inlines its engine and theme hooks). Today they land at 2–4 KB. Measure with:
+
+```bash
+NODE_ENV=production bun build packages/registry/src/<slug>/<slug>.tsx --minify --external='*' --format=esm | gzip -9 -c | wc -c
+```
+
+Keep logic tight, inline only what you need, and avoid abstractions that don't earn their bytes.
 
 ## Pull request checklist
 

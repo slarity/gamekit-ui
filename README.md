@@ -38,7 +38,7 @@ No provider. No peer deps. No init step. Each game is a single drop-in file that
 
 ## ✨ Highlights
 
-- **🪶 Minimal** — each game is a single file with zero npm dependencies beyond `react` and your existing `cn` helper. ≤6&nbsp;KB gzipped.
+- **🪶 Minimal** — each game is a single file with zero npm dependencies beyond `react` and your existing `cn` helper. **2–4&nbsp;KB minified + gzipped** (the raw `.tsx` is bigger because it inlines its engine and theme hooks), and lazy-loadable so it never weighs down your initial bundle.
 - **🎨 Themeable** — your `--primary` / `--secondary` / `--accent` drive the *playfield*, not just the chrome. Canvas games read the tokens at runtime; DOM games use Tailwind token classes. Change your theme and the games recolor live.
 - **🚫 Zero assets** — no images, audio, or fonts. Every pixel is drawn with CSS or `<canvas>`.
 - **♿ Accessible** — keyboard + touch input, visible focus rings, `aria-live` announcements, and `prefers-reduced-motion` support in every game.
@@ -80,6 +80,21 @@ export default function NotFound() {
 ```
 
 That's it — no setup. On a single-game page like this, the game captures keyboard input globally, so it responds the moment a visitor presses a key (no click-to-focus needed).
+
+### Bundle size & lazy-loading
+
+The installed `.tsx` looks big (~15–28 KB) because it inlines its own engine and theme hooks to stay a true single-file drop-in — but that's **source**, not what ships. Built for production each game is **2–4 KB minified + gzipped**.
+
+Because every game is a self-contained module, it's trivially code-split — lazy-load it so it never touches your initial bundle and only downloads when the easter egg actually renders:
+
+```tsx
+import dynamic from "next/dynamic";
+
+const Snake = dynamic(() => import("@/components/games/snake").then((m) => m.Snake), {
+  ssr: false,
+  loading: () => <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />,
+});
+```
 
 ### Namespace install (optional)
 

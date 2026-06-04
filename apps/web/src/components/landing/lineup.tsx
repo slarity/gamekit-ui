@@ -20,7 +20,7 @@ export function Lineup() {
             Ten classics, themed to your app.
           </h2>
           <p className="mt-2 text-muted-foreground text-sm">
-            Canvas or DOM, all under 6&nbsp;KB. Install one, or grab the whole cabinet.
+            Canvas or DOM, all 2–4&nbsp;KB gzipped. Install one, or grab the whole cabinet.
           </p>
         </div>
         <Link
