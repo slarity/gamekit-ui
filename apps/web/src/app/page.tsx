@@ -56,8 +56,8 @@ export default function Home() {
                 <Badge variant="outline" className="font-mono font-normal text-muted-foreground">
                   zero deps
                 </Badge>
-                <Badge variant="outline" className="font-mono font-normal text-muted-foreground">
-                  ≤6 KB gzipped
+                <Badge variant="outline" className="font-mono font-normal text-muted-foreground flex items-center">
+                  <span className="mt-4">≤</span> 6KB gzipped
                 </Badge>
               </div>
 
