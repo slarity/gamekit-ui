@@ -11,7 +11,7 @@ export function AttractMarquee() {
           <span
             // biome-ignore lint/suspicious/noArrayIndexKey: doubled static list
             key={`${game.name}-${i}`}
-            className="flex items-center gap-3.5 whitespace-nowrap px-6 font-pixel text-[13px] text-muted-foreground"
+            className="flex items-center gap-3.5 whitespace-nowrap px-6 font-pixel text-[13px] text-muted-foreground leading-none"
           >
             <span className="text-primary">▸</span>
             {game.title}
