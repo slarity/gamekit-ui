@@ -2,6 +2,7 @@ import { buttonVariants } from "@gamekitui/ui/components/button";
 import { cn } from "@gamekitui/ui/lib/utils";
 import type { Route } from "next";
 import Link from "next/link";
+import { arcadeGlow } from "@/components/landing/cta-styles";
 import { PixelInvader } from "@/components/pixel-invader";
 import { siteConfig } from "@/lib/site";
 
@@ -34,12 +35,16 @@ export function CtaBand() {
         <h2 className="relative font-semibold text-3xl tracking-tight sm:text-4xl">
           Give your 404 a high score.
         </h2>
-        <p className="blink relative mt-4 font-pixel text-[13px] text-primary">
-          ▸ Insert coin to continue
+        <p className="relative mt-3 font-pixel text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
+          Insert coin to continue
         </p>
 
         <div className="relative mt-7 flex flex-wrap justify-center gap-3">
-          <Link href={"/games" as Route} className={buttonVariants({ size: "lg" })}>
+          <Link
+            href={"/games" as Route}
+            style={arcadeGlow}
+            className={cn(buttonVariants({ size: "lg" }), "transition-[filter] hover:brightness-110")}
+          >
             Browse the cabinet
           </Link>
           <a

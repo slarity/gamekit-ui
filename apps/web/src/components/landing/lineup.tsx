@@ -1,17 +1,8 @@
-import { cn } from "@gamekitui/ui/lib/utils";
 import { ArrowRight } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
-import { PixelInvader } from "@/components/pixel-invader";
+import { GameMotif } from "@/components/landing/game-motifs";
 import { GAMES } from "@/registry/games";
-
-// Cycle the four phosphor accents across the cabinet so the grid reads as a set.
-const ACCENTS = [
-  "text-arcade-green",
-  "text-arcade-cyan",
-  "text-arcade-amber",
-  "text-arcade-magenta",
-];
 
 export function Lineup() {
   return (
@@ -42,20 +33,16 @@ export function Lineup() {
       </div>
 
       <div className="mt-9 grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-5">
-        {GAMES.map((game, i) => (
+        {GAMES.map((game) => (
           <Link
             key={game.name}
             href={`/docs/games/${game.name}` as Route}
-            className="group flex flex-col overflow-hidden rounded-lg border bg-card transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_18px_40px_-28px_#000]"
+            className="lineup-card group flex flex-col overflow-hidden rounded-lg border bg-card transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_18px_40px_-28px_#000]"
           >
             <div className="crt-screen grid aspect-[16/11] place-items-center border-b">
-              <PixelInvader
-                className={cn(
-                  "relative z-[1] w-9 transition-transform group-hover:scale-110",
-                  ACCENTS[i % ACCENTS.length],
-                )}
-                aria-label=""
-              />
+              <div className="relative z-[1]">
+                <GameMotif name={game.name} />
+              </div>
             </div>
             <div className="flex items-center justify-between gap-2 px-3.5 py-3">
               <span className="font-medium text-sm">{game.title}</span>

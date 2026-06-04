@@ -1,0 +1,291 @@
+/* ============================================================
+   Lineup game motifs 👾 — tiny CSS dioramas, one per game.
+   Animate on hover of the parent `.lineup-card`. Recolor with the
+   live theme via --primary / --arcade-*.
+   ============================================================ */
+
+/* Snake — hopping cells */
+.m-cells {
+  display: flex;
+  gap: 3px;
+}
+.m-cells span {
+  width: 11px;
+  height: 11px;
+  background: var(--primary);
+  border-radius: 2px;
+  opacity: 0.9;
+}
+.lineup-card:hover .m-cells span {
+  animation: gk-hop 0.6s ease infinite;
+}
+.lineup-card:hover .m-cells span:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.lineup-card:hover .m-cells span:nth-child(3) {
+  animation-delay: 0.16s;
+}
+.lineup-card:hover .m-cells span:nth-child(4) {
+  animation-delay: 0.24s;
+}
+@keyframes gk-hop {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Tic-Tac-Toe — 3×3 with marks */
+.m-grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 12px);
+  grid-template-rows: repeat(3, 12px);
+  gap: 3px;
+}
+.m-grid3 b {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted-foreground);
+}
+.m-grid3 b.x {
+  color: var(--primary);
+}
+.m-grid3 b.o {
+  color: var(--arcade-magenta);
+}
+
+/* 2048 + Memory Match — tiles */
+.m-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 16px);
+  grid-template-rows: repeat(2, 16px);
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+}
+.m-tiles b {
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  color: #000;
+}
+
+/* Whack-a-Mole — popping moles */
+.m-mole {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.m-mole i {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 0 0 7px 7px;
+  background: var(--secondary);
+  overflow: hidden;
+}
+.m-mole i.up::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 0;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 6px 6px 0 0;
+}
+.lineup-card:hover .m-mole i.up::after {
+  animation: gk-mole 0.7s ease infinite alternate;
+}
+@keyframes gk-mole {
+  from {
+    height: 2px;
+  }
+  to {
+    height: 11px;
+  }
+}
+
+/* Minesweeper — grid with flags */
+.m-mine {
+  display: grid;
+  grid-template-columns: repeat(3, 12px);
+  grid-template-rows: repeat(3, 12px);
+  gap: 2px;
+}
+.m-mine i {
+  background: var(--secondary);
+  border-radius: 2px;
+}
+.m-mine i.f {
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  color: var(--arcade-magenta);
+}
+.m-mine i.f::after {
+  content: "⚑";
+}
+
+/* Pong — bouncing ball */
+.m-pong {
+  position: relative;
+  width: 64px;
+  height: 40px;
+}
+.m-pong .pad {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--muted-foreground);
+  transform: translateY(-50%);
+}
+.m-pong .pad.l {
+  left: 2px;
+}
+.m-pong .pad.r {
+  right: 2px;
+}
+.m-pong .ball {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--primary);
+}
+.lineup-card:hover .m-pong .ball {
+  animation: gk-pong 1.1s ease-in-out infinite alternate;
+}
+@keyframes gk-pong {
+  from {
+    left: 14px;
+    top: 30%;
+  }
+  to {
+    left: 46px;
+    top: 70%;
+  }
+}
+
+/* Breakout — brick wall */
+.m-bricks {
+  display: grid;
+  grid-template-columns: repeat(5, 9px);
+  gap: 2px;
+}
+.m-bricks i {
+  height: 5px;
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--primary) 70%, var(--secondary));
+}
+
+/* Dino Runner — jumping dino + scrolling cactus */
+.m-dino {
+  position: relative;
+  width: 64px;
+  height: 34px;
+}
+.m-dino .ground {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+}
+.m-dino .d {
+  position: absolute;
+  bottom: 7px;
+  left: 12px;
+  width: 8px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+.m-dino .c {
+  position: absolute;
+  bottom: 7px;
+  right: 8px;
+  width: 6px;
+  height: 8px;
+  background: var(--muted-foreground);
+}
+.lineup-card:hover .m-dino .d {
+  animation: gk-jump 0.8s ease infinite;
+}
+@keyframes gk-jump {
+  30%,
+  60% {
+    transform: translateY(-12px);
+  }
+}
+.lineup-card:hover .m-dino .c {
+  animation: gk-cact 1.6s linear infinite;
+}
+@keyframes gk-cact {
+  from {
+    right: -6px;
+  }
+  to {
+    right: 64px;
+  }
+}
+
+/* Flappy — bobbing bird + pipes */
+.m-flap {
+  position: relative;
+  width: 64px;
+  height: 40px;
+}
+.m-flap .bird {
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--arcade-amber);
+}
+.m-flap .pipe {
+  position: absolute;
+  right: 10px;
+  width: 8px;
+  background: color-mix(in oklab, var(--primary) 60%, var(--secondary));
+}
+.m-flap .pipe.t {
+  top: 0;
+  height: 13px;
+}
+.m-flap .pipe.b {
+  bottom: 0;
+  height: 13px;
+}
+.lineup-card:hover .m-flap .bird {
+  animation: gk-flap 1s ease-in-out infinite alternate;
+}
+@keyframes gk-flap {
+  from {
+    top: 8px;
+  }
+  to {
+    top: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lineup-card:hover .m-cells span,
+  .lineup-card:hover .m-pong .ball,
+  .lineup-card:hover .m-mole i.up::after,
+  .lineup-card:hover .m-dino .d,
+  .lineup-card:hover .m-dino .c,
+  .lineup-card:hover .m-flap .bird {
+    animation: none;
+  }
+}

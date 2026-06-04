@@ -7,6 +7,7 @@ import Link from "next/link";
 import { AttractMarquee } from "@/components/landing/attract-marquee";
 import { Cabinet } from "@/components/landing/cabinet";
 import { CtaBand } from "@/components/landing/cta-band";
+import { arcadeGlow } from "@/components/landing/cta-styles";
 import { Lineup } from "@/components/landing/lineup";
 import { ThemeSwatches } from "@/components/landing/theme-swatches";
 import { InstallCommand } from "@/components/install-command";
@@ -71,7 +72,11 @@ export default function Home() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2.5">
-                <Link href={"/games" as Route} className={cn(buttonVariants({ size: "lg" }), "group")}>
+                <Link
+                  href={"/games" as Route}
+                  style={arcadeGlow}
+                  className={cn(buttonVariants({ size: "lg" }), "group transition-[filter] hover:brightness-110")}
+                >
                   Browse all {GAMES.length} games
                   <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
                 </Link>
@@ -165,20 +170,35 @@ export default function Home() {
               </span>
               <span className="ml-2">app/not-found.tsx</span>
             </div>
-            <pre className="overflow-x-auto p-5 font-mono text-[12.5px] text-muted-foreground leading-relaxed">
-              <code>{`// 1 — install
-$ npx shadcn@latest add gamekitui.com/r/snake.json
-
-// 2 — use it
-import { Snake } from "@/components/games/snake"
-
-export default function NotFound() {
-  return (
-    <main className="grid place-items-center">
-      <Snake />   {/* inherits --primary */}
-    </main>
-  )
-}`}</code>
+            <pre className="overflow-x-auto whitespace-pre p-5 font-mono text-[12.5px] text-foreground/85 leading-relaxed">
+              <code>
+                <span className="text-muted-foreground">{"// 1 — install\n"}</span>
+                <span className="text-primary">$</span>
+                {" npx shadcn@latest add gamekitui.com/r/snake.json\n\n"}
+                <span className="text-muted-foreground">{"// 2 — use it\n"}</span>
+                <span className="text-arcade-cyan">import</span>
+                {" { "}
+                <span className="text-arcade-magenta">Snake</span>
+                {" } "}
+                <span className="text-arcade-cyan">from</span>{" "}
+                <span className="text-arcade-magenta">{'"@/components/games/snake"'}</span>
+                {"\n\n"}
+                <span className="text-arcade-cyan">export default function</span>{" "}
+                <span className="text-arcade-amber">NotFound</span>
+                {"() {\n  "}
+                <span className="text-arcade-cyan">return</span>
+                {" (\n    <"}
+                <span className="text-arcade-magenta">main</span>
+                {" className="}
+                <span className="text-arcade-amber">{'"grid place-items-center"'}</span>
+                {">\n      <"}
+                <span className="text-arcade-magenta">Snake</span>
+                {" />   "}
+                <span className="text-muted-foreground">{"{/* inherits --primary */}"}</span>
+                {"\n    </"}
+                <span className="text-arcade-magenta">main</span>
+                {">\n  )\n}"}
+              </code>
             </pre>
           </div>
         </div>
