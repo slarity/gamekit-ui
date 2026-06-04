@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GameKit UI — Drop-in browser games for shadcn 👾</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👾</text></svg>" />
+<link rel="stylesheet" href="gamekit.css" />
+<style>
+/* ====================== page layout ====================== */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--line-soft);
+}
+.nav-in { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .mk { font-size: 22px; line-height: 1; filter: saturate(1.1); }
+.brand .wm { font-family: var(--pixel); font-size: 13px; letter-spacing: 0.02em; }
+.brand .wm .ui { color: var(--accent); }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links a.lnk { padding: 8px 12px; border-radius: 6px; font-size: 14px; color: var(--ink-dim); transition: color .15s, background .15s; }
+.nav-links a.lnk:hover { color: var(--ink); background: var(--bg-1); }
+.nav-gh { display: inline-flex; align-items: center; gap: 8px; }
+@media (max-width: 720px){ .nav-links .lnk { display:none; } }
+
+/* ====================== hero ====================== */
+.hero { padding: 64px 0 40px; }
+.hero-grid { display: grid; grid-template-columns: 1.06fr 0.94fr; gap: 52px; align-items: center; }
+.hero h1 { font-size: clamp(38px, 5.4vw, 64px); letter-spacing: -0.035em; }
+.hero h1 .nl { display: block; }
+.hero h1 .accent { text-shadow: 0 0 38px color-mix(in oklab, var(--accent) 45%, transparent); }
+.hero .lede { margin-top: 20px; font-size: 17.5px; line-height: 1.6; color: var(--ink-dim); max-width: 30em; }
+.hero .pills-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.hero .cmd { margin-top: 26px; max-width: 480px; }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.theme-row { display: flex; align-items: center; gap: 12px; margin-top: 26px; }
+.theme-row .lab { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.14em; }
+.theme-row .swatches { display: flex; gap: 8px; }
+
+/* CRT cabinet (right) */
+.cabinet-screen {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 40px 90px -50px #000, inset 0 1px 0 color-mix(in oklab, #fff 6%, transparent);
+}
+.cab-marquee {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--pixel); font-size: 10px; color: var(--ink-faint);
+  padding: 4px 6px 12px;
+}
+.cab-marquee .gk { color: var(--accent); }
+.screen-wrap { position: relative; aspect-ratio: 1; }
+.crt { width: 100%; height: 100%; }
+#snake { width: 100%; height: 100%; }
+.snake-overlay {
+  position: absolute; inset: 0; z-index: 8;
+  display: grid; place-content: center; justify-items: center; gap: 14px; text-align: center;
+  background: radial-gradient(ellipse at center, color-mix(in oklab, var(--bg-1) 55%, transparent), color-mix(in oklab, var(--bg-1) 88%, transparent));
+  transition: opacity .25s ease;
+}
+.snake-overlay[data-state="playing"] { opacity: 0; pointer-events: none; }
+.snake-overlay .title { font-family: var(--pixel); font-size: 16px; }
+.snake-overlay[data-state="over"] .title::after { content: " — game over"; color: var(--magenta); }
+.snake-overlay .hint { font-family: var(--mono); font-size: 12px; color: var(--ink-dim); }
+.snake-overlay[data-state="idle"] .resume { display: none; }
+.hud-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 6px 4px; }
+.hud-cell .label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); white-space: nowrap; }
+.hud-cell .num { font-family: var(--mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent); }
+.hud-cell.hi .num { color: var(--amber); }
+.cab-foot { display:flex; align-items:center; justify-content:center; gap:8px; font-family: var(--mono); font-size: 11px; color: var(--ink-faint); padding-top: 8px; }
+.cab-foot kbd { font-family: var(--mono); background: var(--bg-2); border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:1px 6px; font-size: 11px; color: var(--ink-dim); }
+
+@media (max-width: 920px){
+  .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+  .hero { padding: 40px 0 24px; }
+  .cabinet-screen { max-width: 440px; }
+}
+
+/* ====================== attract marquee ====================== */
+.attract { border-block: 1px solid var(--line-soft); background: var(--bg-1); padding: 14px 0; margin-top: 18px; }
+.attract .marquee-track { align-items: center; }
+.attract .mq-item { display: inline-flex; align-items: center; gap: 14px; padding: 0 26px; font-family: var(--pixel); font-size: 13px; color: var(--ink-dim); white-space: nowrap; }
+.attract .mq-item .tag { color: var(--accent); }
+.attract .mq-sep { width: 6px; height: 6px; background: var(--ink-faint); display: inline-block; }
+
+/* ====================== pillars ====================== */
+.pillars { padding: 78px 0 30px; }
+.pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 36px; }
+.pillar { padding: 22px; background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--r); position: relative; overflow: hidden; }
+.pillar .num { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+.pillar h3 { font-size: 18px; margin: 12px 0 8px; }
+.pillar p { font-size: 14px; color: var(--ink-dim); line-height: 1.55; }
+.pillar .ic { width: 30px; height: 30px; color: var(--accent); }
+@media (max-width: 860px){ .pillars-grid { grid-template-columns: repeat(2,1fr);} }
+@media (max-width: 480px){ .pillars-grid { grid-template-columns: 1fr;} }
+
+.sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.sec-head h2 { font-size: clamp(26px, 3.4vw, 38px); letter-spacing: -0.03em; }
+.sec-head .sub { color: var(--ink-dim); font-size: 15px; margin-top: 8px; }
+
+/* ====================== lineup ====================== */
+.lineup { padding: 70px 0; }
+.lineup-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 38px; }
+@media (max-width: 1040px){ .lineup-grid { grid-template-columns: repeat(3,1fr);} }
+@media (max-width: 640px){ .lineup-grid { grid-template-columns: repeat(2,1fr);} }
+.cart {
+  display: flex; flex-direction: column; gap: 0;
+  background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--r);
+  overflow: hidden; transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  text-decoration: none;
+}
+.cart:hover { transform: translateY(-3px); border-color: color-mix(in oklab, var(--accent) 55%, var(--line)); box-shadow: 0 18px 40px -28px #000; }
+.cart .mini {
+  aspect-ratio: 16/11; background: oklch(0.135 0.012 260);
+  position: relative; overflow: hidden; display: grid; place-items: center;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cart .meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 12px 14px; }
+.cart .meta .nm { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.cart .meta .ty { font-family: var(--mono); font-size: 9.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.1em; border:1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
+
+/* mini game motifs (CSS) */
+.m-cells { display:flex; gap:3px; }
+.m-cells span { width:11px; height:11px; background: var(--accent); border-radius:2px; opacity:.9; }
+.cart:hover .m-cells span { animation: hop .6s ease infinite; }
+.cart:hover .m-cells span:nth-child(2){ animation-delay:.08s } .cart:hover .m-cells span:nth-child(3){ animation-delay:.16s } .cart:hover .m-cells span:nth-child(4){ animation-delay:.24s }
+@keyframes hop { 50%{ transform: translateY(-5px);} }
+
+.m-grid3 { display:grid; grid-template-columns: repeat(3,12px); grid-template-rows: repeat(3,12px); gap:3px; }
+.m-grid3 b { border:1px solid var(--line); border-radius:2px; display:grid; place-items:center; font-family:var(--mono); font-size:9px; color:var(--ink-dim); }
+.m-grid3 b.x { color: var(--accent); } .m-grid3 b.o { color: var(--magenta); }
+
+.m-tiles { display:grid; grid-template-columns: repeat(2,16px); grid-template-rows: repeat(2,16px); gap:3px; font-family:var(--mono); font-size:8px; }
+.m-tiles b { border-radius:3px; display:grid; place-items:center; color:#000; }
+
+.m-pong { width:64px; height:40px; position:relative; }
+.m-pong .pad { position:absolute; width:3px; height:14px; background:var(--ink-dim); border-radius:2px; top:50%; transform:translateY(-50%); }
+.m-pong .pad.l{ left:2px } .m-pong .pad.r{ right:2px }
+.m-pong .ball { position:absolute; width:5px; height:5px; background:var(--accent); border-radius:1px; top:50%; left:50%; }
+.cart:hover .m-pong .ball { animation: pong 1.1s ease-in-out infinite alternate; }
+@keyframes pong { from{ left:14px; top:30%;} to{ left:46px; top:70%;} }
+
+.m-bricks { display:grid; grid-template-columns: repeat(5,9px); gap:2px; }
+.m-bricks i { height:5px; border-radius:1px; background: color-mix(in oklab, var(--accent) 70%, var(--bg-3)); }
+
+.m-mine { display:grid; grid-template-columns: repeat(3,12px); grid-template-rows:repeat(3,12px); gap:2px; }
+.m-mine i { background: var(--bg-3); border-radius:2px; }
+.m-mine i.f { color: var(--magenta); display:grid; place-items:center; font-size:9px; }
+.m-mine i.f::after{ content:"⚑"; }
+
+.m-mole { display:flex; gap:8px; align-items:flex-end; }
+.m-mole i { width:14px; height:14px; border-radius: 0 0 7px 7px; background: var(--bg-3); position:relative; overflow:hidden; }
+.m-mole i.up::after{ content:""; position:absolute; left:2px; right:2px; bottom:0; height:10px; background: var(--accent); border-radius:6px 6px 0 0; }
+.cart:hover .m-mole i.up::after { animation: mole .7s ease infinite alternate; }
+@keyframes mole { from{ height:2px } to{ height:11px } }
+
+.m-dino { width:64px; height:34px; position:relative; }
+.m-dino .ground { position:absolute; bottom:6px; left:0; right:0; height:1px; background: var(--line); }
+.m-dino .d { position:absolute; bottom:7px; left:12px; width:8px; height:10px; background: var(--accent); border-radius:2px; }
+.m-dino .c { position:absolute; bottom:7px; right:8px; width:6px; height:8px; background: var(--ink-faint); }
+.cart:hover .m-dino .d { animation: jump .8s ease infinite; } @keyframes jump { 30%,60%{ transform: translateY(-12px);} }
+.cart:hover .m-dino .c { animation: cact 1.6s linear infinite; } @keyframes cact { from{ right:-6px } to{ right:64px } }
+
+.m-flap { width:64px; height:40px; position:relative; }
+.m-flap .bird { position:absolute; width:7px; height:7px; background: var(--amber); border-radius:2px; left:14px; top:16px; }
+.m-flap .pipe { position:absolute; width:8px; background: color-mix(in oklab, var(--accent) 60%, var(--bg-3)); right:10px; }
+.m-flap .pipe.t{ top:0; height:13px } .m-flap .pipe.b{ bottom:0; height:13px }
+.cart:hover .m-flap .bird { animation: flap 1s ease-in-out infinite alternate; } @keyframes flap { from{ top:8px } to{ top:24px } }
+
+/* ====================== quickstart ====================== */
+.quick { padding: 30px 0 80px; }
+.quick-grid { display:grid; grid-template-columns: 0.9fr 1.1fr; gap: 44px; align-items:center; margin-top: 36px; }
+.steps { display:flex; flex-direction:column; gap: 22px; }
+.step { display:flex; gap:16px; }
+.step .n { font-family: var(--pixel); font-size: 12px; color: var(--accent); width: 34px; height:34px; flex:none; display:grid; place-items:center; border:1px solid var(--line); border-radius: 8px; background: var(--bg-1); }
+.step h4 { font-size: 16px; margin-bottom: 4px; }
+.step p { font-size: 14px; color: var(--ink-dim); }
+.code-card { background: var(--bg-1); border:1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.code-card .bar { display:flex; align-items:center; gap:8px; padding: 11px 14px; border-bottom: 1px solid var(--line-soft); font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+.code-card .bar .dots { display:flex; gap:6px; } .code-card .bar .dots i{ width:10px; height:10px; border-radius:50%; background: var(--bg-3);} 
+.code-card pre { margin:0; padding: 18px; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; overflow-x:auto; color: var(--ink-dim); }
+.code-card pre .t { color: var(--accent); } .code-card pre .c { color: var(--ink-faint); } .code-card pre .s { color: var(--magenta); } .code-card pre .k { color: var(--cyan); }
+@media (max-width: 860px){ .quick-grid { grid-template-columns: 1fr; gap: 30px; } }
+
+/* ====================== CTA ====================== */
+.cta-band { padding: 30px 0 90px; }
+.coin {
+  position: relative; text-align: center;
+  background: var(--bg-1); border: 1px solid var(--line); border-radius: 18px;
+  padding: 64px 28px; overflow: hidden;
+}
+.coin::before { content:""; position:absolute; inset:0; background: radial-gradient(60% 120% at 50% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%); }
+.coin .inv-row { display:flex; justify-content:center; gap:18px; margin-bottom: 26px; position:relative; }
+.coin .inv-row .invader { width: 30px; color: var(--accent); }
+.coin .inv-row .invader:nth-child(2){ color: var(--magenta);} .coin .inv-row .invader:nth-child(3){ color: var(--cyan);} .coin .inv-row .invader:nth-child(4){ color: var(--amber);}
+.coin h2 { font-size: clamp(28px, 4vw, 46px); position:relative; }
+.coin .ps { font-family: var(--pixel); font-size: 13px; color: var(--accent); margin-top: 18px; position:relative; }
+.coin .cta { display:flex; gap:12px; justify-content:center; margin-top: 28px; position:relative; flex-wrap:wrap; }
+
+/* ====================== footer ====================== */
+.foot { border-top: 1px solid var(--line-soft); padding: 40px 0 60px; }
+.foot-grid { display:flex; align-items:flex-start; justify-content:space-between; gap: 30px; flex-wrap:wrap; }
+.foot .brand .wm { font-size: 12px; }
+.foot p { font-size: 13px; color: var(--ink-faint); max-width: 38em; margin-top: 14px; line-height:1.6; }
+.foot-links { display:flex; gap: 22px; font-family: var(--mono); font-size: 13px; }
+.foot-links a { color: var(--ink-dim); } .foot-links a:hover { color: var(--accent); }
+.invader-anim { position: relative; }
+.invader-anim .invader { position:absolute; inset:0; }
+.invader-anim [data-f="b"] { animation: march 0.66s steps(1) infinite; }
+.invader-anim [data-f="a"] { animation: march 0.66s steps(1) infinite reverse; }
+</style>
+</head>
+<body data-scanlines="on">
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="GameKit UI home">
+      <span class="mk">👾</span>
+      <span class="wm">GAMEKIT<span class="ui">UI</span></span>
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="#lineup">Games</a>
+      <a class="lnk" href="#quickstart">Docs</a>
+      <a class="lnk" href="GameKit Brand Guidelines.html">Brand</a>
+      <a class="btn btn-ghost nav-gh" href="https://github.com/slarity/gamekit-ui">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        <span class="k">3.2k</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- ============ HERO ============ -->
+<section class="section hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="pills-row">
+        <span class="pill"><span class="dot"></span>10 games</span>
+        <span class="pill">shadcn registry</span>
+        <span class="pill">zero deps · ≤6 KB</span>
+      </div>
+      <h1>
+        <span class="nl">Drop-in</span>
+        <span class="nl"><span class="accent">arcade</span> for</span>
+        <span class="nl">your shadcn app.</span>
+      </h1>
+      <p class="lede">Tiny, themeable React games for your 404s, empty states, and landing-page easter eggs. Install with the shadcn CLI — no provider, no peer deps, no init step.</p>
+
+      <div class="cmd">
+        <span class="prompt">$</span>
+        <code>npx shadcn@latest add https://gamekitui.com/r/snake.json</code>
+        <button class="copy" data-copy="npx shadcn@latest add https://gamekitui.com/r/snake.json" aria-label="Copy install command">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+
+      <div class="cta">
+        <a class="btn btn-primary" href="#lineup">Browse all 10 games
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn" href="#quickstart">Read the docs</a>
+      </div>
+
+      <div class="theme-row">
+        <span class="lab">Theme it live</span>
+        <div class="swatches">
+          <button class="swatch" data-accent-swatch="green" aria-pressed="true" aria-label="Phosphor green"></button>
+          <button class="swatch" data-accent-swatch="magenta" aria-pressed="false" aria-label="Hot magenta"></button>
+          <button class="swatch" data-accent-swatch="cyan" aria-pressed="false" aria-label="Cyan"></button>
+          <button class="swatch" data-accent-swatch="amber" aria-pressed="false" aria-label="Amber"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRT cabinet -->
+    <div class="cabinet-screen" id="snake-panel">
+      <div class="cab-marquee">
+        <span><span class="gk">GAMEKIT</span> // SNAKE</span>
+        <span class="blink">●</span>
+      </div>
+      <div class="screen-wrap">
+        <div class="crt">
+          <canvas id="snake" width="440" height="440"></canvas>
+        </div>
+        <div class="snake-overlay" id="snake-overlay" data-state="idle">
+          <div class="title pixel">Snake</div>
+          <div class="hint">Arrow keys / WASD / swipe</div>
+          <button class="btn btn-primary" id="snake-start">▶ Insert coin</button>
+        </div>
+      </div>
+      <div class="hud-bar">
+        <div class="hud-cell"><div class="label">Score</div><div class="num" id="snake-score">000</div></div>
+        <div class="hud-cell hi" style="text-align:right"><div class="label">Hi-Score</div><div class="num" id="snake-best">000</div></div>
+      </div>
+      <div class="cab-foot">Recolor it — hit a <kbd>swatch</kbd> and the playfield repaints live.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ATTRACT MARQUEE ============ -->
+<div class="attract marquee" data-marquee aria-hidden="true">
+  <div class="marquee-track">
+    <span class="mq-item"><span class="tag">▸</span> SNAKE <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> 2048 <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> MINESWEEPER <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> PONG <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> BREAKOUT <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> TIC-TAC-TOE <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> MEMORY MATCH <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> WHACK-A-MOLE <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> DINO RUNNER <span class="mq-sep"></span></span>
+    <span class="mq-item"><span class="tag">▸</span> FLAPPY <span class="mq-sep"></span></span>
+  </div>
+</div>
+
+<!-- ============ PILLARS ============ -->
+<section class="section pillars wrap">
+  <div class="rule"><span class="eyebrow">Why GameKit</span></div>
+  <div class="sec-head" style="margin-top:18px">
+    <div><h2>Small enough to forget. Fun enough to ship.</h2></div>
+  </div>
+  <div class="pillars-grid">
+    <div class="pillar">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
+      <div class="num" style="margin-top:14px">01</div>
+      <h3>Minimal</h3>
+      <p>Each game is ≤6 KB gzipped — a single drop-in file with zero npm dependencies.</p>
+    </div>
+    <div class="pillar">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2a10 10 0 1 0 0 20 1.25 1.25 0 0 0 0-2.5 2.5 2.5 0 0 1 0-5 7.5 7.5 0 0 0 0-12.5z"/></svg>
+      <div class="num" style="margin-top:14px">02</div>
+      <h3>Themeable</h3>
+      <p>Reads your shadcn tokens at runtime. Change <span class="mono accent">--primary</span> and the playfield recolors.</p>
+    </div>
+    <div class="pillar">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 3l18 18M21 3 3 21"/></svg>
+      <div class="num" style="margin-top:14px">03</div>
+      <h3>Zero assets</h3>
+      <p>No images, audio, or fonts. Every pixel is drawn with CSS or <span class="mono">&lt;canvas&gt;</span>.</p>
+    </div>
+    <div class="pillar">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg>
+      <div class="num" style="margin-top:14px">04</div>
+      <h3>Accessible</h3>
+      <p>Keyboard + touch, focus rings, <span class="mono">aria-live</span>, and reduced-motion in every game.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LINEUP ============ -->
+<section class="section lineup wrap" id="lineup">
+  <div class="rule"><span class="eyebrow">The lineup · 10 classics</span></div>
+  <div class="sec-head" style="margin-top:18px">
+    <div>
+      <h2>Ten classics, themed to your app.</h2>
+      <p class="sub">Canvas or DOM, all under 6 KB. Install one, or grab the whole cabinet.</p>
+    </div>
+    <a class="btn btn-ghost" href="#">View all
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <div class="lineup-grid">
+    <a class="cart" href="#"><div class="mini"><div class="m-cells"><span></span><span></span><span></span><span></span></div></div><div class="meta"><span class="nm">Snake</span><span class="ty">canvas</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-grid3"><b class="x">×</b><b></b><b class="o">○</b><b></b><b class="x">×</b><b></b><b class="o">○</b><b></b><b class="x">×</b></div></div><div class="meta"><span class="nm">Tic-Tac-Toe</span><span class="ty">dom</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-tiles"><b style="background:var(--accent)">2</b><b style="background:var(--amber)">4</b><b style="background:var(--magenta)">8</b><b style="background:var(--cyan)">16</b></div></div><div class="meta"><span class="nm">2048</span><span class="ty">dom</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-tiles"><b style="background:var(--bg-3);color:var(--accent)">★</b><b style="background:var(--bg-3)"></b><b style="background:var(--bg-3)"></b><b style="background:var(--bg-3);color:var(--accent)">★</b></div></div><div class="meta"><span class="nm">Memory Match</span><span class="ty">dom</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-mole"><i class="up"></i><i></i><i class="up"></i></div></div><div class="meta"><span class="nm">Whack-a-Mole</span><span class="ty">dom</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-mine"><i></i><i></i><i class="f"></i><i></i><i></i><i></i><i class="f"></i><i></i><i></i></div></div><div class="meta"><span class="nm">Minesweeper</span><span class="ty">dom</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-pong"><span class="pad l"></span><span class="ball"></span><span class="pad r"></span></div></div><div class="meta"><span class="nm">Pong</span><span class="ty">canvas</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-bricks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="meta"><span class="nm">Breakout</span><span class="ty">canvas</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-dino"><span class="ground"></span><span class="d"></span><span class="c"></span></div></div><div class="meta"><span class="nm">Dino Runner</span><span class="ty">canvas</span></div></a>
+
+    <a class="cart" href="#"><div class="mini"><div class="m-flap"><span class="bird"></span><span class="pipe t"></span><span class="pipe b"></span></div></div><div class="meta"><span class="nm">Flappy</span><span class="ty">canvas</span></div></a>
+  </div>
+</section>
+
+<!-- ============ QUICKSTART ============ -->
+<section class="section quick wrap" id="quickstart">
+  <div class="rule"><span class="eyebrow">Quickstart · 30 seconds</span></div>
+  <div class="quick-grid">
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div><h4>Run the CLI</h4><p>Point the shadcn CLI at any game's registry URL. It drops one file into your project.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Import &amp; render</h4><p>No provider, no init. Render the component anywhere — it inherits your theme tokens.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Ship the easter egg</h4><p>Drop it on a 404, an empty state, or a loading screen. It just works.</p></div></div>
+    </div>
+    <div class="code-card">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span>app/not-found.tsx</span></div>
+      <pre><span class="c">// 1 — install</span>
+<span class="t">$</span> npx shadcn@latest add gamekitui.com/r/snake.json
+
+<span class="c">// 2 — use it</span>
+<span class="k">import</span> { <span class="s">Snake</span> } <span class="k">from</span> <span class="s">"@/components/gamekit/snake"</span>
+
+<span class="k">export default function</span> <span class="s">NotFound</span>() {
+  <span class="k">return</span> (
+    &lt;<span class="s">main</span> className=<span class="s">"grid place-items-center"</span>&gt;
+      &lt;<span class="s">Snake</span> /&gt;   <span class="c">{/* inherits --primary */}</span>
+    &lt;/<span class="s">main</span>&gt;
+  )
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="section cta-band wrap">
+  <div class="coin">
+    <div class="inv-row">
+      <div class="invader-anim" style="width:30px;aspect-ratio:11/8"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+      <div class="invader-anim" style="width:30px;aspect-ratio:11/8"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+      <div class="invader-anim" style="width:30px;aspect-ratio:11/8"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+      <div class="invader-anim" style="width:30px;aspect-ratio:11/8"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+    </div>
+    <h2>Give your 404 a high score.</h2>
+    <div class="ps blink">▸ Insert coin to continue</div>
+    <div class="cta">
+      <a class="btn btn-primary" href="#lineup">Browse the cabinet</a>
+      <a class="btn" href="https://github.com/slarity/gamekit-ui">Star on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand"><span class="mk" style="font-size:20px">👾</span><span class="wm">GAMEKIT<span class="ui">UI</span></span></div>
+      <p>Tiny, themeable browser games for shadcn. ≤6 KB each, zero external assets. GameKit UI is an independent, unaffiliated community project — not built, sponsored, or endorsed by the shadcn/ui team.</p>
+    </div>
+    <div class="foot-links">
+      <a href="#lineup">Games</a>
+      <a href="#quickstart">Docs</a>
+      <a href="GameKit Brand Guidelines.html">Brand</a>
+      <a href="https://github.com/slarity/gamekit-ui">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="landing.js"></script>
+</body>
+</html>

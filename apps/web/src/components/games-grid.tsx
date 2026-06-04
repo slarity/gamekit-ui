@@ -109,7 +109,8 @@ export function GamesGrid() {
 
             <div className="relative grid min-h-[300px] flex-1 place-items-center overflow-hidden border-t bg-dots p-6">
               <div className="mx-auto w-full max-w-[340px]">
-                <GamePreview name={game.name} autoFocus={false} />
+                {/* Gallery renders many live games — keep keys scoped to the focused one. */}
+                <GamePreview name={game.name} autoFocus={false} captureGlobalKeys={false} />
               </div>
             </div>
           </div>

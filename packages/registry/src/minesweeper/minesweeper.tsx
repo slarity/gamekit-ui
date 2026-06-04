@@ -197,6 +197,14 @@ export interface MinesweeperProps {
   className?: string;
   width?: number;
   autoFocus?: boolean;
+  /**
+   * When true (the default), the game listens for keys on `window` so it works
+   * without being focused first — ideal for single-game pages (404s, loading /
+   * empty states). Set false when multiple games share a page, or the game sits
+   * in scrollable content, so it only responds while focused. Ignores keys aimed
+   * at form fields.
+   */
+  captureGlobalKeys?: boolean;
   persistHighScore?: boolean | string;
   onScoreChange?: (score: number) => void;
   onGameOver?: (r: { score: number; won: boolean }) => void;
@@ -224,6 +232,7 @@ export function Minesweeper({
   className,
   width,
   autoFocus = true,
+  captureGlobalKeys = true,
   persistHighScore = true,
   onScoreChange,
   onGameOver,
@@ -459,9 +468,10 @@ export function Minesweeper({
   // Keyboard navigation
   const [cursor, setCursor] = React.useState<[number, number]>([0, 0]);
   React.useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
     const onKey = (e: KeyboardEvent) => {
+      // In global mode, ignore keys aimed at form fields / editable content.
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
       if (status === "won" || status === "lost") {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -506,9 +516,16 @@ export function Minesweeper({
           break;
       }
     };
-    el.addEventListener("keydown", onKey);
-    return () => el.removeEventListener("keydown", onKey);
-  }, [status, handleCellReveal, handleCellFlag, startGame]);
+    // Single-game pages can opt into window-level capture so keys work without
+    // focusing the game; otherwise listen on the wrapper (focus-scoped).
+    const target: Window | HTMLElement | null = captureGlobalKeys
+      ? window
+      : wrapperRef.current;
+    target?.addEventListener("keydown", onKey as EventListener);
+    return () => {
+      target?.removeEventListener("keydown", onKey as EventListener);
+    };
+  }, [status, handleCellReveal, handleCellFlag, startGame, captureGlobalKeys]);
 
   const flags = countFlags(grid);
   const minesRemaining = MINE_COUNT - flags;
@@ -531,7 +548,9 @@ export function Minesweeper({
       style={width !== undefined ? { maxWidth: width } : undefined}
       className={cn(
         "relative flex w-full max-w-md select-none flex-col gap-2 outline-none",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        // Focus ring only matters when keys are focus-scoped; global capture hides it.
+        !captureGlobalKeys &&
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
       onContextMenu={onContextMenu}

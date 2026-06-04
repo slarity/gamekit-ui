@@ -14,21 +14,19 @@ import { Github, Menu } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandWordmark } from "@/components/brand-wordmark";
 
 const NAV = [
   { href: "/docs", label: "Docs" },
   { href: "/games", label: "Games" },
 ] as const;
 
-const GITHUB_URL = "https://github.com/anishsrinivasan/gamekit-ui";
+const GITHUB_URL = "https://github.com/slarity/gamekit-ui";
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-      <span className="text-xl leading-none" aria-hidden="true">
-        👾
-      </span>
-      <span>GameKit UI</span>
+    <Link href="/" aria-label="GameKit UI home">
+      <BrandWordmark />
     </Link>
   );
 }

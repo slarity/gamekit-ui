@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GameKit UI — Brand Guidelines 👾</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👾</text></svg>" />
+<link rel="stylesheet" href="gamekit.css" />
+<style>
+/* ===== shared nav (same as landing) ===== */
+.nav { position: sticky; top: 0; z-index: 100; background: color-mix(in oklab, var(--bg) 78%, transparent); backdrop-filter: blur(14px) saturate(1.2); border-bottom: 1px solid var(--line-soft); }
+.nav-in { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .mk { font-size: 22px; line-height: 1; }
+.brand .wm { font-family: var(--pixel); font-size: 13px; }
+.brand .wm .ui { color: var(--accent); }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links a.lnk { padding: 8px 12px; border-radius: 6px; font-size: 14px; color: var(--ink-dim); transition: color .15s, background .15s; }
+.nav-links a.lnk:hover, .nav-links a.lnk[aria-current]{ color: var(--ink); background: var(--bg-1); }
+@media (max-width: 720px){ .nav-links .lnk { display:none; } }
+
+/* ===== doc header ===== */
+.doc-head { padding: 70px 0 50px; border-bottom: 1px solid var(--line-soft); }
+.doc-head h1 { font-size: clamp(36px, 6vw, 68px); letter-spacing: -0.04em; }
+.doc-head h1 .em { font-family: initial; }
+.doc-head .lede { margin-top: 18px; font-size: 18px; color: var(--ink-dim); max-width: 34em; }
+.doc-meta { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+
+/* ===== section scaffolding ===== */
+.sec { padding: 64px 0; border-bottom: 1px solid var(--line-soft); scroll-margin-top: 80px; }
+.sec-num { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 0.1em; }
+.sec h2 { font-size: clamp(24px, 3.4vw, 34px); letter-spacing: -0.03em; margin: 10px 0 6px; }
+.sec .desc { color: var(--ink-dim); font-size: 15.5px; max-width: 40em; margin-bottom: 36px; }
+.card { background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--r); }
+.label-mono { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.16em; }
+
+/* ===== mark showcase ===== */
+.mark-grid { display:grid; grid-template-columns: 1.1fr 1fr; gap: 18px; }
+@media (max-width: 820px){ .mark-grid { grid-template-columns: 1fr; } }
+.mark-hero { padding: 48px; display:grid; place-items:center; gap: 20px; text-align:center; position:relative; overflow:hidden; }
+.mark-hero .big-emoji { font-size: 120px; line-height: 1; }
+.mark-hero .cap { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.invader-xl { width: 132px; color: var(--accent); }
+.mark-side { display:flex; flex-direction:column; gap: 18px; }
+.mark-row { padding: 26px; display:flex; align-items:center; gap: 22px; }
+.mark-row .invader-anim { width: 46px; aspect-ratio: 11/8; position:relative; flex:none; }
+.mark-row .invader-anim .invader { position:absolute; inset:0; }
+.invader-anim [data-f="b"] { animation: march 0.66s steps(1) infinite; }
+.invader-anim [data-f="a"] { animation: march 0.66s steps(1) infinite reverse; }
+.mark-row h4 { font-size: 15px; margin-bottom: 4px; }
+.mark-row p { font-size: 13.5px; color: var(--ink-dim); }
+
+/* ===== lockup ===== */
+.lockups { display:grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+@media (max-width: 760px){ .lockups { grid-template-columns: 1fr; } }
+.lockup { padding: 40px 28px; display:grid; place-items:center; gap:18px; min-height: 180px; }
+.lk-h { display:flex; align-items:center; gap: 12px; }
+.lk-h .mk { font-size: 30px; } .lk-h .wm { font-family: var(--pixel); font-size: 16px; } .lk-h .wm .ui { color: var(--accent); }
+.lk-v { display:flex; flex-direction:column; align-items:center; gap: 12px; }
+.lk-v .mk { font-size: 40px; } .lk-v .wm { font-family: var(--pixel); font-size: 13px; }
+.lk-cap { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); }
+
+/* ===== clearspace ===== */
+.clear-wrap { display:grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items:stretch; }
+@media (max-width: 760px){ .clear-wrap { grid-template-columns: 1fr; } }
+.clear-demo { padding: 40px; display:grid; place-items:center; }
+.clear-box { position:relative; padding: 44px; border:1px dashed color-mix(in oklab, var(--accent) 50%, var(--line)); display:flex; align-items:center; gap:12px; }
+.clear-box .u { position:absolute; font-family: var(--mono); font-size: 10px; color: var(--accent); }
+.clear-box .u.t { top:-9px; left:50%; transform:translateX(-50%); background: var(--bg-1); padding:0 6px; }
+.clear-box .u.l { left:-22px; top:50%; transform:translateY(-50%) rotate(-90deg); }
+.clear-box .mk { font-size: 36px; } .clear-box .wm { font-family: var(--pixel); font-size: 15px; } .clear-box .wm .ui{ color: var(--accent);}
+.minsize { padding: 32px; display:flex; flex-direction:column; gap: 22px; justify-content:center; }
+.minsize .row { display:flex; align-items:center; gap: 16px; }
+.minsize .swatch-emoji { display:grid; place-items:center; }
+
+/* ===== do / dont ===== */
+.dd { display:grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+@media (max-width: 900px){ .dd { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 520px){ .dd { grid-template-columns: 1fr; } }
+.dd-item { padding: 22px; display:flex; flex-direction:column; gap: 16px; align-items:center; text-align:center; min-height: 150px; justify-content:space-between; }
+.dd-demo { height: 70px; display:grid; place-items:center; font-size: 46px; }
+.dd-tag { display:flex; align-items:center; gap: 7px; font-family: var(--mono); font-size: 11px; text-transform:uppercase; letter-spacing:0.08em; }
+.dd-good .dd-tag { color: var(--green); } .dd-bad .dd-tag { color: var(--magenta); }
+.dd-bad { border-color: color-mix(in oklab, var(--magenta) 28%, var(--line)); }
+.dd-good { border-color: color-mix(in oklab, var(--green) 28%, var(--line)); }
+.dd-item p { font-size: 12.5px; color: var(--ink-dim); }
+
+/* ===== color ===== */
+.pal { display:grid; gap: 26px; }
+.pal-group h4 { font-size: 14px; margin-bottom: 14px; display:flex; align-items:center; gap:10px; }
+.pal-group h4 .label-mono { font-size: 10px; }
+.swrow { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; }
+.sw { border:1px solid var(--line); border-radius: var(--r-s); overflow:hidden; }
+.sw .chip { height: 76px; }
+.sw .info { padding: 10px 12px; background: var(--bg-1); }
+.sw .nm { font-size: 12.5px; font-weight: 600; }
+.sw .val { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); margin-top:3px; word-break: break-all; }
+.accent-switch { display:flex; align-items:center; gap: 12px; margin-bottom: 22px; }
+.accent-switch .label-mono { margin-right: 4px; }
+
+/* ===== type ===== */
+.type-stack { display:flex; flex-direction:column; gap: 14px; }
+.type-card { padding: 26px 28px; display:grid; grid-template-columns: 150px 1fr; gap: 24px; align-items:center; }
+@media (max-width: 720px){ .type-card { grid-template-columns: 1fr; gap: 14px; } }
+.type-card .meta .fam { font-size: 14px; font-weight: 600; } 
+.type-card .meta .use { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: 6px; line-height:1.5; }
+.spec-display { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; }
+.spec-mono { font-family: var(--mono); font-size: 19px; color: var(--ink-dim); }
+.spec-mono .accent { color: var(--accent); }
+.spec-pixel { font-family: var(--pixel); font-size: 19px; }
+.scale-row { display:flex; align-items:baseline; gap: 18px; flex-wrap:wrap; padding: 22px 28px; }
+.scale-row .s { display:flex; flex-direction:column; gap: 4px; }
+.scale-row .s span:first-child { font-weight:700; letter-spacing:-0.03em; line-height:1; }
+.scale-row .s .label-mono { font-size: 9.5px; }
+
+/* ===== motifs ===== */
+.motifs { display:grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+@media (max-width: 820px){ .motifs { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px){ .motifs { grid-template-columns: 1fr; } }
+.motif { overflow:hidden; }
+.motif .vis { height: 130px; position:relative; overflow:hidden; display:grid; place-items:center; background: oklch(0.135 0.012 260); }
+.motif .cap { padding: 16px 18px; }
+.motif .cap h4 { font-size: 14px; margin-bottom: 5px; } .motif .cap p { font-size: 12.5px; color: var(--ink-dim); }
+.motif .scan-demo { position:absolute; inset:0; background: repeating-linear-gradient(to bottom, color-mix(in oklab,#000 26%,transparent) 0 1px, transparent 1px 3px); }
+.motif .hud-demo { display:flex; gap: 26px; font-family: var(--mono); }
+.motif .hud-demo .label-mono { display:block; font-size: 9px; }
+.motif .hud-demo .num { font-size: 26px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.motif .frame-demo { width: 90px; height: 70px; background: var(--bg-2); border: 1px solid var(--accent); }
+.motif .marq-demo { font-family: var(--pixel); font-size: 11px; color: var(--ink-dim); white-space:nowrap; }
+.motif .marq-demo .accent { color: var(--accent); }
+.motif .inv-demo { width: 54px; color: var(--accent); }
+
+/* ===== voice ===== */
+.voice-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px){ .voice-grid { grid-template-columns: 1fr; } }
+.voice-col { padding: 26px 28px; }
+.voice-col h4 { display:flex; align-items:center; gap: 9px; font-size: 14px; margin-bottom: 18px; }
+.voice-col.say h4 { color: var(--green); } .voice-col.dont h4 { color: var(--magenta); }
+.voice-col ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 14px; }
+.voice-col li { font-size: 14.5px; line-height:1.5; padding-left: 22px; position:relative; }
+.voice-col li::before { position:absolute; left:0; top:0; font-family:var(--mono); }
+.voice-col.say li::before { content:"▸"; color: var(--green); }
+.voice-col.dont li::before { content:"×"; color: var(--magenta); }
+.voice-col li .q { color: var(--ink-dim); font-style: italic; }
+.principles { display:grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+@media (max-width: 720px){ .principles { grid-template-columns: 1fr; } }
+.principle { padding: 20px 22px; }
+.principle .n { font-family: var(--pixel); font-size: 11px; color: var(--accent); }
+.principle h4 { font-size: 15px; margin: 12px 0 6px; } .principle p { font-size: 13px; color: var(--ink-dim); }
+
+/* footer */
+.foot { padding: 40px 0 60px; }
+.foot-grid { display:flex; align-items:center; justify-content:space-between; gap: 20px; flex-wrap:wrap; }
+.foot p { font-size: 13px; color: var(--ink-faint); }
+.foot-links { display:flex; gap: 20px; font-family: var(--mono); font-size: 13px; }
+.foot-links a { color: var(--ink-dim);} .foot-links a:hover{ color: var(--accent);}
+</style>
+</head>
+<body data-scanlines="on">
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="GameKit Landing.html"><span class="mk">👾</span><span class="wm">GAMEKIT<span class="ui">UI</span></span></a>
+    <nav class="nav-links">
+      <a class="lnk" href="GameKit Landing.html#lineup">Games</a>
+      <a class="lnk" href="GameKit Landing.html#quickstart">Docs</a>
+      <a class="lnk" href="GameKit Brand Guidelines.html" aria-current="page">Brand</a>
+      <a class="btn btn-ghost" href="GameKit Landing.html">← Landing</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HEADER -->
+<section class="doc-head wrap">
+  <div class="eyebrow">Brand guidelines · v1.0 · 2026</div>
+  <h1 style="margin-top:18px">The <span class="em">👾</span> system<br/>behind GameKit UI.</h1>
+  <p class="lede">How we draw, write, and color GameKit UI — a registry of tiny, themeable arcade games for shadcn. Retro-arcade soul, modern-clean execution.</p>
+  <div class="doc-meta">
+    <span class="pill"><span class="dot"></span>Mark &amp; wordmark</span>
+    <span class="pill">Color tokens</span>
+    <span class="pill">Type scale</span>
+    <span class="pill">Pixel motifs</span>
+    <span class="pill">Voice</span>
+  </div>
+</section>
+
+<!-- 01 — THE MARK -->
+<section class="sec wrap" id="mark">
+  <div class="sec-num">01 / IDENTITY</div>
+  <h2>The mark — 👾</h2>
+  <p class="desc">The space-invader is the whole brand. It is the favicon, the avatar, the loading sprite, and the first character of the wordmark. Two forms exist: the <b>emoji glyph</b> (platform-native, used inline and as the avatar) and the <b>pixel sprite</b> (our 11×8 CSS-drawn invader, used at large sizes and in motion).</p>
+  <div class="mark-grid">
+    <div class="card mark-hero">
+      <div class="big-emoji">👾</div>
+      <div class="invader-xl"><div class="invader" data-invader="a"></div></div>
+      <div class="cap">Emoji glyph + 11×8 pixel sprite — same silhouette, two renderings.</div>
+    </div>
+    <div class="mark-side">
+      <div class="card mark-row">
+        <div class="invader-anim"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+        <div><h4>It marches</h4><p>In motion the sprite cycles two frames (legs alternate) — the classic attract-mode shuffle. Use for loaders and empty states.</p></div>
+      </div>
+      <div class="card mark-row">
+        <div class="invader-anim" style="color:var(--magenta)"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+        <div><h4>It recolors</h4><p>The sprite is drawn with <span class="mono">currentColor</span>. Tint it with any palette accent — never with an off-palette hue.</p></div>
+      </div>
+      <div class="card mark-row">
+        <div class="invader-anim" style="color:var(--cyan)"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div>
+        <div><h4>It stays pixel</h4><p>Hard edges only. No anti-aliasing, no smoothing, no gradients inside the silhouette. Pixels are the point.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 — LOCKUPS -->
+<section class="sec wrap" id="lockup">
+  <div class="sec-num">02 / WORDMARK</div>
+  <h2>Lockups</h2>
+  <p class="desc">The wordmark sets <b>GAMEKIT</b> in Press Start 2P with <b>UI</b> in the live accent. Three approved lockups. Mark-only is allowed where space is tight (favicons, avatars, app icons).</p>
+  <div class="lockups">
+    <div class="card lockup">
+      <div class="lk-h"><span class="mk">👾</span><span class="wm">GAMEKIT<span class="ui">UI</span></span></div>
+      <div class="lk-cap">Horizontal — primary</div>
+    </div>
+    <div class="card lockup">
+      <div class="lk-v"><span class="mk">👾</span><span class="wm">GAMEKIT<span class="ui">UI</span></span></div>
+      <div class="lk-cap">Stacked — square spaces</div>
+    </div>
+    <div class="card lockup">
+      <span style="font-size:56px">👾</span>
+      <div class="lk-cap">Mark-only — icons &amp; avatars</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 — CLEARSPACE & SIZE -->
+<section class="sec wrap" id="clearspace">
+  <div class="sec-num">03 / SPACING</div>
+  <h2>Clearspace &amp; minimum size</h2>
+  <p class="desc">Keep one mark-height of clear space on all sides. Never crowd the lockup with UI, text, or other logos.</p>
+  <div class="clear-wrap">
+    <div class="card clear-demo">
+      <div class="clear-box">
+        <span class="u t">1×</span><span class="u l">1×</span>
+        <span class="mk">👾</span><span class="wm">GAMEKIT<span class="ui">UI</span></span>
+      </div>
+    </div>
+    <div class="card minsize">
+      <div class="label-mono">Minimum sizes</div>
+      <div class="row"><span style="font-size:16px">👾</span><span class="mono dim" style="font-size:13px">16 px — favicon / inline</span></div>
+      <div class="row"><span style="font-size:24px">👾</span><span class="mono dim" style="font-size:13px">24 px — avatar minimum</span></div>
+      <div class="row"><span class="wm" style="font-family:var(--pixel);font-size:11px">GAMEKIT<span class="ui" style="color:var(--accent)">UI</span></span><span class="mono dim" style="font-size:13px">11 px — wordmark minimum</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 — DO / DON'T -->
+<section class="sec wrap" id="usage">
+  <div class="sec-num">04 / MARK USAGE</div>
+  <h2>Do &amp; don't</h2>
+  <p class="desc">The mark is small and loud — protect it.</p>
+  <div class="dd">
+    <div class="card dd-item dd-good"><div class="dd-demo">👾</div><div class="dd-tag">▸ Do</div><p>Use on dark surfaces at full opacity.</p></div>
+    <div class="card dd-item dd-good"><div class="dd-demo" style="color:var(--cyan)"><div class="invader-xl" style="width:56px;color:var(--cyan)"><div class="invader" data-invader="a"></div></div></div><div class="dd-tag">▸ Do</div><p>Tint the sprite with a palette accent.</p></div>
+    <div class="card dd-item dd-bad"><div class="dd-demo" style="transform:rotate(22deg)">👾</div><div class="dd-tag">× Don't</div><p>Rotate, skew, or flip the mark.</p></div>
+    <div class="card dd-item dd-bad"><div class="dd-demo" style="filter:drop-shadow(0 6px 6px rgba(0,0,0,.6)) blur(0.4px)">👾</div><div class="dd-tag">× Don't</div><p>Add shadows, glows, or bevels.</p></div>
+    <div class="card dd-item dd-bad"><div class="dd-demo" style="transform:scaleX(1.7)">👾</div><div class="dd-tag">× Don't</div><p>Stretch or distort proportions.</p></div>
+    <div class="card dd-item dd-bad"><div class="dd-demo" style="background:#fff;border-radius:8px;width:62px;height:62px;font-size:40px">👾</div><div class="dd-tag">× Don't</div><p>Place on light or busy backgrounds.</p></div>
+    <div class="card dd-item dd-bad"><div class="dd-demo">🛸</div><div class="dd-tag">× Don't</div><p>Swap in a different alien or emoji.</p></div>
+    <div class="card dd-item dd-bad"><div class="dd-demo" style="font-size:22px">👾</div><div class="dd-tag">× Don't</div><p>Use below the 16 px minimum.</p></div>
+  </div>
+</section>
+
+<!-- 05 — COLOR -->
+<section class="sec wrap" id="color">
+  <div class="sec-num">05 / COLOR</div>
+  <h2>Color system</h2>
+  <p class="desc">CRT-dark by default: a blue-black stack of surfaces, near-white ink, and a phosphor accent. <b>Green is primary</b>; magenta, cyan, and amber are the secondary CRT triad. All values are authored in <span class="mono">oklch</span> so they stay perceptually even.</p>
+
+  <div class="accent-switch">
+    <span class="label-mono">Live accent</span>
+    <button class="swatch" data-accent-swatch="green" aria-pressed="true" aria-label="Green"></button>
+    <button class="swatch" data-accent-swatch="magenta" aria-pressed="false" aria-label="Magenta"></button>
+    <button class="swatch" data-accent-swatch="cyan" aria-pressed="false" aria-label="Cyan"></button>
+    <button class="swatch" data-accent-swatch="amber" aria-pressed="false" aria-label="Amber"></button>
+    <span class="mono dim" style="font-size:12px">— recolors this page &amp; the games</span>
+  </div>
+
+  <div class="pal">
+    <div class="pal-group">
+      <h4>Surfaces <span class="label-mono">blue-black CRT stack</span></h4>
+      <div class="swrow">
+        <div class="sw"><div class="chip" style="background:oklch(0.155 0.012 260)"></div><div class="info"><div class="nm">--bg</div><div class="val">oklch(0.155 0.012 260)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.185 0.014 260)"></div><div class="info"><div class="nm">--bg-1</div><div class="val">oklch(0.185 0.014 260)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.215 0.016 262)"></div><div class="info"><div class="nm">--bg-2</div><div class="val">oklch(0.215 0.016 262)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.255 0.018 262)"></div><div class="info"><div class="nm">--bg-3</div><div class="val">oklch(0.255 0.018 262)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.320 0.018 262)"></div><div class="info"><div class="nm">--line</div><div class="val">oklch(0.320 0.018 262)</div></div></div>
+      </div>
+    </div>
+    <div class="pal-group">
+      <h4>Ink <span class="label-mono">cool whites</span></h4>
+      <div class="swrow">
+        <div class="sw"><div class="chip" style="background:oklch(0.972 0.004 250)"></div><div class="info"><div class="nm">--ink</div><div class="val">oklch(0.972 0.004 250)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.760 0.010 255)"></div><div class="info"><div class="nm">--ink-dim</div><div class="val">oklch(0.760 0.010 255)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.560 0.014 258)"></div><div class="info"><div class="nm">--ink-faint</div><div class="val">oklch(0.560 0.014 258)</div></div></div>
+      </div>
+    </div>
+    <div class="pal-group">
+      <h4>Arcade accents <span class="label-mono">phosphor · primary = green</span></h4>
+      <div class="swrow">
+        <div class="sw"><div class="chip" style="background:oklch(0.872 0.205 148)"></div><div class="info"><div class="nm">--green ◆ primary</div><div class="val">oklch(0.872 0.205 148)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.720 0.250 350)"></div><div class="info"><div class="nm">--magenta</div><div class="val">oklch(0.720 0.250 350)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.840 0.135 205)"></div><div class="info"><div class="nm">--cyan</div><div class="val">oklch(0.840 0.135 205)</div></div></div>
+        <div class="sw"><div class="chip" style="background:oklch(0.840 0.155 78)"></div><div class="info"><div class="nm">--amber</div><div class="val">oklch(0.840 0.155 78)</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 — TYPE -->
+<section class="sec wrap" id="type">
+  <div class="sec-num">06 / TYPOGRAPHY</div>
+  <h2>Typography</h2>
+  <p class="desc">Clean where it counts, pixel where it plays. Three families, strict roles — never set body copy in the pixel face.</p>
+  <div class="type-stack">
+    <div class="card type-card">
+      <div class="meta"><div class="fam">Geist</div><div class="use">Headlines + UI + body.<br/>300–800.</div></div>
+      <div class="spec-display">Drop-in arcade for shadcn.</div>
+    </div>
+    <div class="card type-card">
+      <div class="meta"><div class="fam">Geist Mono</div><div class="use">Code, install commands, HUD score numerals.</div></div>
+      <div class="spec-mono">$ npx shadcn add <span class="accent">snake.json</span> &nbsp; SCORE 0480</div>
+    </div>
+    <div class="card type-card">
+      <div class="meta"><div class="fam">Press Start 2P</div><div class="use">Chrome only — wordmark, marquees, “insert coin”. Never body.</div></div>
+      <div class="spec-pixel">GAME&nbsp;OVER · <span class="accent">INSERT&nbsp;COIN</span></div>
+    </div>
+    <div class="card scale-row">
+      <div class="s"><span style="font-size:48px">Aa</span><span class="label-mono">Display / 48</span></div>
+      <div class="s"><span style="font-size:34px">Aa</span><span class="label-mono">H2 / 34</span></div>
+      <div class="s"><span style="font-size:22px">Aa</span><span class="label-mono">H3 / 22</span></div>
+      <div class="s"><span style="font-size:16px">Aa</span><span class="label-mono">Body / 16</span></div>
+      <div class="s"><span style="font-size:13px">Aa</span><span class="label-mono">Small / 13</span></div>
+      <div class="s"><span class="pixel" style="font-size:13px">Aa</span><span class="label-mono">Pixel / 13</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 — MOTIFS -->
+<section class="sec wrap" id="motifs">
+  <div class="sec-num">07 / MOTIFS</div>
+  <h2>Arcade chrome</h2>
+  <p class="desc">The recurring textures that make a shadcn page feel like a cabinet. Use sparingly — one or two per surface, never all at once.</p>
+  <div class="motifs">
+    <div class="card motif"><div class="vis"><div class="scan-demo"></div><span class="pixel accent" style="font-size:13px;position:relative">SCANLINES</span></div><div class="cap"><h4>Scanlines</h4><p>Page-wide veil at 5% black. Toggleable; off for print &amp; reduced-motion.</p></div></div>
+    <div class="card motif"><div class="vis crt" style="border-radius:0"><span class="pixel" style="font-size:12px;color:var(--ink-dim)">CRT GLOW</span></div><div class="cap"><h4>CRT screen</h4><p>Vignette + scanline curvature on game panels only.</p></div></div>
+    <div class="card motif"><div class="vis"><div class="hud-demo"><div><span class="label-mono">Score</span><span class="num">0480</span></div><div><span class="label-mono">Hi</span><span class="num" style="color:var(--amber)">1290</span></div></div></div><div class="cap"><h4>HUD counters</h4><p>Mono, tabular, accent-tinted. Score in accent, hi-score in amber.</p></div></div>
+    <div class="card motif"><div class="vis"><div class="inv-demo invader-anim" style="position:relative;width:54px;aspect-ratio:11/8"><div class="invader" data-f="a"></div><div class="invader" data-f="b"></div></div></div><div class="cap"><h4>Marching sprite</h4><p>Two-frame invader for loaders, 404s, and empty states.</p></div></div>
+    <div class="card motif"><div class="vis"><div class="marq-demo"><span class="accent">▸</span> SNAKE ▪ 2048 ▪ PONG <span class="accent">▸</span></div></div><div class="cap"><h4>Attract marquee</h4><p>Looping pixel ticker of the lineup. Pauses on hover.</p></div></div>
+    <div class="card motif"><div class="vis"><div class="frame-demo pixelframe"></div></div><div class="cap"><h4>Pixel frame</h4><p>Notched-corner cabinet panels. Hard steps, no radius.</p></div></div>
+  </div>
+</section>
+
+<!-- 08 — VOICE -->
+<section class="sec wrap" id="voice">
+  <div class="sec-num">08 / VOICE</div>
+  <h2>Voice &amp; tone</h2>
+  <p class="desc">We talk like a developer who loves arcades — precise about the tech, playful about the games. Short. Confident. A little 8-bit.</p>
+  <div class="principles">
+    <div class="card principle"><div class="n">A</div><h4>Dev-honest</h4><p>Lead with the real numbers: ≤6 KB, zero deps, one file. No hand-waving.</p></div>
+    <div class="card principle"><div class="n">B</div><h4>Arcade-warm</h4><p>“Insert coin”, “high score”, “game over”. Borrow the cabinet, not the cheese.</p></div>
+    <div class="card principle"><div class="n">C</div><h4>Tight</h4><p>One idea per line. If a sentence can lose words, it loses them.</p></div>
+  </div>
+  <div class="voice-grid">
+    <div class="card voice-col say">
+      <h4>▸ Say</h4>
+      <ul>
+        <li>“Drop-in arcade for your shadcn app.”</li>
+        <li>“Give your 404 a high score.”</li>
+        <li>“≤6 KB. Zero deps. One file.”</li>
+        <li>“Reads your tokens — change <span class="q">--primary</span> and the playfield recolors.”</li>
+      </ul>
+    </div>
+    <div class="card voice-col dont">
+      <h4>× Don't</h4>
+      <ul>
+        <li><span class="q">“Revolutionary gaming framework.”</span></li>
+        <li><span class="q">“Leverage synergistic play experiences.”</span></li>
+        <li><span class="q">“The #1 best games library ever!!!”</span></li>
+        <li><span class="q">“Powered by cutting-edge AI.”</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot wrap">
+  <div class="foot-grid">
+    <div class="brand"><span class="mk" style="font-size:20px">👾</span><span class="wm">GAMEKIT<span class="ui">UI</span></span></div>
+    <p>Brand guidelines v1.0 — an independent community project, unaffiliated with shadcn/ui.</p>
+    <div class="foot-links">
+      <a href="GameKit Landing.html">Landing</a>
+      <a href="GameKit Landing.html#lineup">Games</a>
+      <a href="https://github.com/slarity/gamekit-ui">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="landing.js"></script>
+</body>
+</html>
