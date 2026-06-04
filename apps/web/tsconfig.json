@@ -21,7 +21,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@gamekitui/ui/*": ["../../packages/ui/src/*"]
+      "@gamekitui/ui/*": ["../../packages/ui/src/*"],
+      "@gamekitui/registry/*": ["../../packages/registry/src/*"],
+      "@gamekitui/game-core": ["../../packages/game-core/src/index.ts"]
     }
   },
   "include": [

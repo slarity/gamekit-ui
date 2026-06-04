@@ -1,0 +1,26 @@
+---
+title: Memory Match
+description: Flip cards to find matching pairs in as few moves as possible.
+---
+
+Flip cards to find matching pairs in as few moves as possible.
+
+<ComponentPreview name="memory-match" />
+
+<GameInfo name="memory-match" />
+
+## Theming
+
+This is a DOM game. Its playfield is driven by your shadcn `--primary`, `--secondary`, and `--accent` tokens via Tailwind token classes, so it recolors automatically. Change your theme and Memory Match recolors with it. Try the **Customize** button in the corner.
+
+## Install
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/memory-match.json
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<MemoryMatch className="mx-auto w-full max-w-sm" />
+```

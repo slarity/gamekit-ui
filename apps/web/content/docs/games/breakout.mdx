@@ -1,0 +1,26 @@
+---
+title: Breakout
+description: Bounce the ball, clear the bricks, don't drop. Endless levels.
+---
+
+Bounce the ball, clear the bricks, don't drop. Endless levels.
+
+<ComponentPreview name="breakout" />
+
+<GameInfo name="breakout" />
+
+## Theming
+
+This is a canvas game. Its playfield is driven by your shadcn `--primary`, `--secondary`, and `--accent` tokens — read at runtime and re-resolved when you toggle dark mode or swap a theme preset. Change your theme and Breakout recolors with it. Try the **Customize** button in the corner.
+
+## Install
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/breakout.json
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<Breakout className="mx-auto w-full max-w-sm" />
+```

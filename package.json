@@ -25,6 +25,8 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "check-types": "turbo check-types",
+    "registry:build": "bun run scripts/build-registry.ts",
+    "smoke": "cd packages/registry && bun smoke.tsx",
     "dev:web": "turbo -F web dev"
   },
   "dependencies": {

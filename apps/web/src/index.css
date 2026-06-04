@@ -1,1 +1,28 @@
 @import "@gamekitui/ui/globals.css";
+
+/* Subtle, uniform dotted grid for preview backgrounds (no gradient/vignette) */
+.bg-dots {
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--border) 55%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
+}
+
+/* Inline code inside docs (block code in <pre> is left to shiki) */
+.mdx :not(pre) > code {
+  border-radius: calc(var(--radius) - 4px);
+  border: 1px solid var(--border);
+  background-color: var(--muted);
+  padding: 0.1rem 0.35rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.85em;
+  color: var(--foreground);
+}
+
+/* Shiki dual-theme: light values are inline; switch to dark vars under .dark */
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}

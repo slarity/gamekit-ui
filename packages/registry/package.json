@@ -1,0 +1,27 @@
+{
+  "name": "@gamekitui/registry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Source for the 10 gamekitui games shipped via the shadcn registry.",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gamekitui/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@gamekitui/config": "workspace:*",
+    "@gamekitui/game-core": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

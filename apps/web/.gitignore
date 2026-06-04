@@ -51,6 +51,9 @@ next-env.d.ts
 !.vscode/extensions.json
 .idea
 
+# Generated shadcn registry artifacts (built by scripts/build-registry.ts)
+/public/r
+
 # Other
 dev-dist
 
@@ -58,3 +61,6 @@ dev-dist
 .dev.vars*
 
 .open-next
+
+# Fumadocs generated
+/.source

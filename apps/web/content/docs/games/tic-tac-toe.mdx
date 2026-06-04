@@ -1,0 +1,26 @@
+---
+title: Tic-Tac-Toe
+description: Classic 3×3 Tic-Tac-Toe with an unbeatable CPU. Pure DOM, fully themeable.
+---
+
+Classic 3×3 Tic-Tac-Toe with an unbeatable CPU. Pure DOM, fully themeable.
+
+<ComponentPreview name="tic-tac-toe" />
+
+<GameInfo name="tic-tac-toe" />
+
+## Theming
+
+This is a DOM game. Its playfield is driven by your shadcn `--primary`, `--secondary`, and `--accent` tokens via Tailwind token classes, so it recolors automatically. Change your theme and Tic-Tac-Toe recolors with it. Try the **Customize** button in the corner.
+
+## Install
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/tic-tac-toe.json
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<TicTacToe className="mx-auto w-full max-w-sm" />
+```

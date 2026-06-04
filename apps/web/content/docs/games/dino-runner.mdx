@@ -1,0 +1,26 @@
+---
+title: Dino Runner
+description: The offline-dino endless runner. Jump the cacti. Perfect for 404 pages.
+---
+
+The offline-dino endless runner. Jump the cacti. Perfect for 404 pages.
+
+<ComponentPreview name="dino-runner" />
+
+<GameInfo name="dino-runner" />
+
+## Theming
+
+This is a canvas game. Its playfield is driven by your shadcn `--primary`, `--secondary`, and `--accent` tokens — read at runtime and re-resolved when you toggle dark mode or swap a theme preset. Change your theme and Dino Runner recolors with it. Try the **Customize** button in the corner.
+
+## Install
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/dino-runner.json
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<DinoRunner className="mx-auto w-full max-w-sm" />
+```

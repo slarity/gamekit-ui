@@ -1,0 +1,63 @@
+---
+title: Installation
+description: Install GameKit UI games with the shadcn CLI — by registry URL or the @gamekit namespace. Includes the usage pattern and the shared props every game accepts.
+---
+
+## Install a game
+
+Add any game by its registry URL:
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/snake.json
+```
+
+The CLI writes the component into your project and rewrites the `cn` import to your own `@/lib/utils`. That's the only assumption — the standard shadcn helper.
+
+## Register the namespace (optional)
+
+Add the `@gamekit` namespace to your `components.json` to install games by short name:
+
+```json
+{
+  "registries": {
+    "@gamekit": "https://gamekitui.com/r/{name}.json"
+  }
+}
+```
+
+```bash
+npx shadcn@latest add @gamekit/snake
+```
+
+## Use it
+
+```tsx
+// app/not-found.tsx
+import { Snake } from "@/components/games/snake";
+
+export default function NotFound() {
+  return (
+    <main className="grid min-h-svh place-items-center">
+      <div className="space-y-4 text-center">
+        <h1 className="text-4xl font-semibold">404</h1>
+        <p className="text-muted-foreground">Play a round while you decide where to go.</p>
+        <Snake className="mx-auto rounded-lg border" width={320} />
+      </div>
+    </main>
+  );
+}
+```
+
+## Shared props
+
+Every game accepts a common subset of props:
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `className` | `string` | Tailwind classes on the wrapper. |
+| `width` / `height` | `number` | Logical size in CSS px (canvas games scale via DPR). |
+| `paused` | `boolean` | Externally pause the game. |
+| `autoFocus` | `boolean` | Focus on mount so keyboard input works. |
+| `persistHighScore` | `boolean \| string` | localStorage key, or a default per game. |
+| `onScoreChange` | `(score: number) => void` | Fires when the score changes. |
+| `onGameOver` | `(r: { score: number; won: boolean }) => void` | Fires on game over. |

@@ -1,0 +1,671 @@
+"use client";
+
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+/* -------------------------------------------------------------------------- */
+/*                              Shared primitives                              */
+/* -------------------------------------------------------------------------- */
+
+const THEME_TOKENS = [
+  "background",
+  "foreground",
+  "primary",
+  "primary-foreground",
+  "secondary",
+  "accent",
+  "muted",
+  "muted-foreground",
+  "border",
+  "ring",
+  "destructive",
+] as const;
+type ThemeTokens = Record<(typeof THEME_TOKENS)[number], string>;
+
+function readTheme(el: HTMLElement | null): ThemeTokens {
+  const target = el ?? (typeof document !== "undefined" ? document.documentElement : null);
+  const cs = target ? getComputedStyle(target) : null;
+  const out = {} as ThemeTokens;
+  for (const t of THEME_TOKENS) out[t] = cs ? cs.getPropertyValue(`--${t}`).trim() : "";
+  return out;
+}
+
+function useGameTheme(ref: React.RefObject<HTMLElement | null>): ThemeTokens {
+  const [theme, setTheme] = React.useState<ThemeTokens>(() => readTheme(null));
+  React.useEffect(() => {
+    const read = () => setTheme(readTheme(ref.current));
+    read();
+    const mo = new MutationObserver(read);
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
+    return () => mo.disconnect();
+  }, [ref]);
+  return theme;
+}
+
+function usePrefersReducedMotion(): boolean {
+  const [reduce, setReduce] = React.useState(false);
+  React.useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduce(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduce(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduce;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               Game constants                                */
+/* -------------------------------------------------------------------------- */
+
+// Logical (design) coordinate space. All draw + physics happen in this space;
+// the canvas is scaled to fit the responsive playfield.
+const LOGW = 480;
+const LOGH = 180;
+
+const GROUND_Y_RATIO = 0.72; // ground line as fraction of logical height
+const GROUND_Y = Math.floor(LOGH * GROUND_Y_RATIO);
+
+const DINO_W = 28;
+const DINO_H = 32;
+const DINO_X = 60; // fixed horizontal position
+
+const GRAVITY = 1800; // px/s²
+const JUMP_VY = -560; // px/s (negative = upward) — clears tallest cactus at apex
+const DUCK_HEIGHT = 18; // reduced height when ducking
+const INITIAL_SPEED = 220; // px/s
+const SPEED_INCREMENT = 8; // px/s per 100 score points
+const MAX_SPEED = 600;
+
+const SCORE_RATE = 10; // score points per second
+
+// Collision forgiveness: inset both boxes so a near-miss isn't a hit.
+const DINO_INSET_X = 5;
+const DINO_INSET_Y = 5;
+const CACTUS_INSET = 2;
+
+/* -------------------------------------------------------------------------- */
+/*                               Game types                                    */
+/* -------------------------------------------------------------------------- */
+
+interface Obstacle {
+  id: number;
+  x: number;
+  w: number;
+  h: number;
+}
+
+interface DinoState {
+  y: number; // height of dino bottom above ground (0 = on ground)
+  vy: number; // vertical velocity px/s (positive = downward)
+  ducking: boolean;
+  jumping: boolean;
+  step: number; // accumulated phase for running leg animation
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                  Props                                       */
+/* -------------------------------------------------------------------------- */
+
+export interface DinoRunnerProps {
+  className?: string;
+  /** Optional max width (px) of the responsive game; defaults to fluid full-width. */
+  width?: number;
+  paused?: boolean;
+  autoFocus?: boolean;
+  persistHighScore?: boolean | string;
+  onScoreChange?: (score: number) => void;
+  onGameOver?: (r: { score: number; won: boolean }) => void;
+  onStart?: () => void;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               Component                                      */
+/* -------------------------------------------------------------------------- */
+
+export function DinoRunner({
+  className,
+  width,
+  paused = false,
+  autoFocus = true,
+  persistHighScore = true,
+  onScoreChange,
+  onGameOver,
+  onStart,
+}: DinoRunnerProps) {
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null);
+  const playfieldRef = React.useRef<HTMLDivElement | null>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const theme = useGameTheme(wrapperRef);
+  const reduce = usePrefersReducedMotion();
+
+  const [status, setStatus] = React.useState<"idle" | "playing" | "gameover">("idle");
+  const [score, setScore] = React.useState(0);
+  const [high, setHigh] = React.useState(0);
+  const [offscreen, setOffscreen] = React.useState(false);
+
+  const storageKey =
+    typeof persistHighScore === "string"
+      ? persistHighScore
+      : persistHighScore === false
+        ? null
+        : "gamekitui:dino-runner:hi";
+
+  // ---- mutable live refs (read by rAF loop without re-subscribing) ----
+  const statusRef = React.useRef(status);
+  const pausedRef = React.useRef(paused);
+  const offscreenRef = React.useRef(offscreen);
+  const themeRef = React.useRef(theme);
+  const reduceRef = React.useRef(reduce);
+  statusRef.current = status;
+  pausedRef.current = paused;
+  offscreenRef.current = offscreen;
+  themeRef.current = theme;
+  reduceRef.current = reduce;
+
+  // ---- game state refs ----
+  const dinoRef = React.useRef<DinoState>({
+    y: 0,
+    vy: 0,
+    ducking: false,
+    jumping: false,
+    step: 0,
+  });
+  const obstaclesRef = React.useRef<Obstacle[]>([]);
+  const speedRef = React.useRef(INITIAL_SPEED);
+  const scoreRef = React.useRef(0);
+  const nextObstacleIdRef = React.useRef(0);
+  const nextObstacleXRef = React.useRef(LOGW + 80);
+  // accumulated score fraction (for smooth scoring)
+  const scoreAccRef = React.useRef(0);
+  // ground scroll for decorative ticks
+  const groundOffsetRef = React.useRef(0);
+
+  // ---- load high score ----
+  React.useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) setHigh(Number(raw) || 0);
+    } catch {
+      /* ignore */
+    }
+  }, [storageKey]);
+
+  const submitHigh = React.useCallback(
+    (s: number) => {
+      setHigh((prev) => {
+        if (s <= prev) return prev;
+        if (storageKey) {
+          try {
+            window.localStorage.setItem(storageKey, String(s));
+          } catch {
+            /* ignore */
+          }
+        }
+        return s;
+      });
+    },
+    [storageKey],
+  );
+
+  // ---- offscreen / visibility pause ----
+  React.useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e) setOffscreen(!e.isIntersecting);
+    });
+    io.observe(el);
+    const onVis = () => setOffscreen(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
+  // ---- start / reset ----
+  const start = React.useCallback(() => {
+    dinoRef.current = { y: 0, vy: 0, ducking: false, jumping: false, step: 0 };
+    obstaclesRef.current = [];
+    speedRef.current = INITIAL_SPEED;
+    scoreRef.current = 0;
+    scoreAccRef.current = 0;
+    groundOffsetRef.current = 0;
+    nextObstacleIdRef.current = 0;
+    nextObstacleXRef.current = LOGW + 80 + Math.random() * 200;
+    setScore(0);
+    setStatus("playing");
+    onStart?.();
+    onScoreChange?.(0);
+    // Focus the wrapper so keyboard controls work after the Start button unmounts.
+    wrapperRef.current?.focus();
+  }, [onStart, onScoreChange]);
+
+  // ---- responsive canvas sizing: match playfield CSS size × DPR, scale to logical space ----
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const field = playfieldRef.current;
+    if (!canvas || !field) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      const rect = field.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width));
+      const h = Math.max(1, Math.round(rect.height));
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      const scale = w / LOGW;
+      // Draw in logical space (LOGW × LOGH); transform maps it onto the device pixels.
+      ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(field);
+    return () => ro.disconnect();
+  }, []);
+
+  // ---- main rAF loop + draw ----
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const groundY = GROUND_Y;
+
+    // ---- obstacle spawning helpers ----
+    const spawnGap = () => 280 + Math.random() * 220;
+
+    const spawnObstacle = (): Obstacle => {
+      const h = 22 + Math.random() * 22; // 22–44 px tall
+      const w = 12 + Math.random() * 10; // 12–22 px wide
+      return {
+        id: nextObstacleIdRef.current++,
+        x: nextObstacleXRef.current,
+        w,
+        h,
+      };
+    };
+
+    // ---- draw helpers ----
+    const roundRect = (
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      r: number,
+      fill: string,
+    ) => {
+      ctx.fillStyle = fill;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      ctx.fill();
+    };
+
+    const drawDino = (t: ThemeTokens, dino: DinoState) => {
+      const ducking = dino.ducking;
+      const dh = ducking ? DUCK_HEIGHT : DINO_H;
+      // Bottom of the body sits `dino.y` above the ground.
+      const dy = groundY - dh - dino.y; // top pixel of dino body
+
+      const bodyColor = t.primary || "#000";
+      const legColor = t.primary || "#000";
+
+      // body
+      roundRect(DINO_X, dy, DINO_W, dh, 5, bodyColor);
+
+      // eye (white)
+      const eyeR = 3;
+      const eyeX = DINO_X + DINO_W - eyeR - 4;
+      const eyeY = dy + eyeR + 4;
+      ctx.fillStyle = t["primary-foreground"] || "#fff";
+      ctx.beginPath();
+      ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // pupil
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.arc(eyeX + 1, eyeY + 1, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (!ducking) {
+        const legW = 7;
+        const bodyBottom = dy + dh;
+        const airborne = dino.jumping || dino.y > 0.5;
+
+        if (airborne) {
+          // Tucked jump pose: both legs short and pulled up.
+          const legH = 6;
+          roundRect(DINO_X + 4, bodyBottom - 2, legW, legH, 2, legColor);
+          roundRect(DINO_X + 14, bodyBottom - 2, legW, legH, 2, legColor);
+        } else {
+          // Running: alternate two leg poses based on the step phase.
+          const phase = Math.floor(dino.step) % 2 === 0;
+          const frontH = phase ? 10 : 5;
+          const backH = phase ? 5 : 10;
+          roundRect(DINO_X + 4, bodyBottom, legW, backH, 2, legColor);
+          roundRect(DINO_X + 14, bodyBottom, legW, frontH, 2, legColor);
+        }
+      }
+    };
+
+    const drawObstacle = (t: ThemeTokens, obs: Obstacle) => {
+      const x = obs.x;
+      const y = groundY - obs.h;
+      const cactusColor = t.secondary || "#555";
+
+      // main stem
+      roundRect(x, y, obs.w, obs.h, 3, cactusColor);
+
+      // arm stubs for taller cacti
+      if (obs.h > 30) {
+        const armW = Math.floor(obs.w * 0.7);
+        const armH = 5;
+        const midY = y + obs.h * 0.35;
+        roundRect(x - armW + 2, midY, armW, armH, 2, cactusColor);
+        roundRect(x + obs.w - 2, midY + 4, armW, armH, 2, cactusColor);
+      }
+    };
+
+    const drawGround = (t: ThemeTokens) => {
+      ctx.strokeStyle = t.accent || "#888";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY);
+      ctx.lineTo(LOGW, groundY);
+      ctx.stroke();
+
+      // scrolling tick marks
+      ctx.strokeStyle = t.accent || "#888";
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4;
+      const spacing = 40;
+      const offset = groundOffsetRef.current % spacing;
+      for (let x = -offset; x < LOGW; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, groundY + 2);
+        ctx.lineTo(x + 8, groundY + 2);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const draw = () => {
+      const t = themeRef.current;
+      ctx.clearRect(0, 0, LOGW, LOGH);
+      ctx.fillStyle = t.background || "#fff";
+      ctx.fillRect(0, 0, LOGW, LOGH);
+
+      drawGround(t);
+
+      for (const obs of obstaclesRef.current) {
+        drawObstacle(t, obs);
+      }
+
+      drawDino(t, dinoRef.current);
+    };
+
+    // ---- collision detection (tight AABB on both axes, with forgiveness inset) ----
+    const checkCollision = (dino: DinoState): boolean => {
+      const dh = dino.ducking ? DUCK_HEIGHT : DINO_H;
+      // Dino body box in logical space.
+      const dinoLeft = DINO_X + DINO_INSET_X;
+      const dinoRight = DINO_X + DINO_W - DINO_INSET_X;
+      const dinoBottom = groundY - dino.y; // rises as the dino jumps
+      const dinoTop = dinoBottom - dh;
+      // Apply vertical forgiveness.
+      const dTop = dinoTop + DINO_INSET_Y;
+      const dBottom = dinoBottom - DINO_INSET_Y;
+
+      for (const obs of obstaclesRef.current) {
+        const cLeft = obs.x + CACTUS_INSET;
+        const cRight = obs.x + obs.w - CACTUS_INSET;
+        const cTop = groundY - obs.h + CACTUS_INSET;
+        const cBottom = groundY - CACTUS_INSET;
+
+        const overlapX = dinoLeft < cRight && dinoRight > cLeft;
+        const overlapY = dTop < cBottom && dBottom > cTop;
+        if (overlapX && overlapY) return true;
+      }
+      return false;
+    };
+
+    // ---- game over callback holder ----
+    const handleGameOver = (finalScore: number) => {
+      setStatus("gameover");
+      submitHigh(finalScore);
+      onGameOver?.({ score: finalScore, won: false });
+    };
+
+    let raf = 0;
+    let last = 0;
+
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame);
+      if (last === 0) last = now;
+      const dtMs = now - last;
+      last = now;
+
+      const active =
+        statusRef.current === "playing" &&
+        !pausedRef.current &&
+        !offscreenRef.current;
+
+      if (active) {
+        // cap dt to avoid tunneling on tab refocus; freeze under reduced motion
+        const dt = reduceRef.current ? 0 : Math.min(dtMs / 1000, 0.05);
+
+        const dino = dinoRef.current;
+        const speed = speedRef.current;
+
+        // ---- physics ----
+        if (dino.jumping || dino.y > 0) {
+          dino.vy += GRAVITY * dt;
+          dino.y -= dino.vy * dt;
+          if (dino.y <= 0) {
+            dino.y = 0;
+            dino.vy = 0;
+            dino.jumping = false;
+          }
+        } else {
+          // ---- running leg animation: advance step phase proportional to speed ----
+          dino.step += dt * (speed / 30);
+        }
+
+        // ---- scroll obstacles ----
+        groundOffsetRef.current += speed * dt;
+        const surviving: Obstacle[] = [];
+        for (const obs of obstaclesRef.current) {
+          obs.x -= speed * dt;
+          if (obs.x + obs.w > -10) surviving.push(obs);
+        }
+        obstaclesRef.current = surviving;
+
+        // ---- spawn new obstacle ----
+        nextObstacleXRef.current -= speed * dt;
+        if (nextObstacleXRef.current <= LOGW) {
+          obstaclesRef.current.push(spawnObstacle());
+          nextObstacleXRef.current = LOGW + spawnGap();
+        }
+
+        // ---- score ----
+        scoreAccRef.current += SCORE_RATE * dt;
+        const newScore = Math.floor(scoreAccRef.current);
+        if (newScore !== scoreRef.current) {
+          scoreRef.current = newScore;
+          setScore(newScore);
+          onScoreChange?.(newScore);
+          // ramp speed
+          const targetSpeed = Math.min(
+            INITIAL_SPEED + Math.floor(newScore / 100) * SPEED_INCREMENT,
+            MAX_SPEED,
+          );
+          speedRef.current = targetSpeed;
+        }
+
+        // ---- collision ----
+        if (checkCollision(dino)) {
+          handleGameOver(scoreRef.current);
+        }
+      }
+
+      draw();
+    };
+
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [onGameOver, onScoreChange, submitHigh]);
+
+  // ---- keyboard input ----
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const key = e.key;
+      const isJump = key === " " || key === "ArrowUp" || key === "w" || key === "W";
+      const isDuck = key === "ArrowDown" || key === "s" || key === "S";
+
+      if (!isJump && !isDuck) return;
+      e.preventDefault();
+
+      if (statusRef.current === "idle") {
+        start();
+        return;
+      }
+      if (statusRef.current === "gameover") {
+        if (isJump) start();
+        return;
+      }
+
+      const dino = dinoRef.current;
+      if (isJump && !dino.jumping && dino.y === 0) {
+        dino.vy = JUMP_VY;
+        dino.jumping = true;
+        dino.ducking = false;
+      }
+      if (isDuck) {
+        dino.ducking = true;
+      }
+    };
+
+    const onKeyUp = (e: KeyboardEvent) => {
+      const isDuck = e.key === "ArrowDown" || e.key === "s" || e.key === "S";
+      if (isDuck) dinoRef.current.ducking = false;
+    };
+
+    const el = wrapperRef.current;
+    el?.addEventListener("keydown", onKey);
+    el?.addEventListener("keyup", onKeyUp);
+    return () => {
+      el?.removeEventListener("keydown", onKey);
+      el?.removeEventListener("keyup", onKeyUp);
+    };
+  }, [start]);
+
+  // ---- pointer input (mouse + touch + pen): tap/click to start & jump ----
+  React.useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const onPointerDown = (e: PointerEvent) => {
+      // Let overlay buttons (Start / Play again) handle their own clicks.
+      if ((e.target as HTMLElement | null)?.closest("button")) return;
+      e.preventDefault();
+      if (statusRef.current !== "playing") {
+        start();
+        return;
+      }
+      const dino = dinoRef.current;
+      if (!dino.jumping && dino.y === 0) {
+        dino.vy = JUMP_VY;
+        dino.jumping = true;
+        dino.ducking = false;
+      }
+    };
+    el.addEventListener("pointerdown", onPointerDown);
+    return () => el.removeEventListener("pointerdown", onPointerDown);
+  }, [start]);
+
+  // ---- autofocus ----
+  React.useEffect(() => {
+    if (autoFocus) wrapperRef.current?.focus();
+  }, [autoFocus]);
+
+  return (
+    <div
+      ref={wrapperRef}
+      tabIndex={0}
+      role="application"
+      aria-label="Dino Runner game"
+      style={width ? { maxWidth: width } : undefined}
+      className={cn(
+        "relative flex w-full select-none flex-col gap-2 outline-none",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        className,
+      )}
+    >
+      {/* Score bar */}
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="inline-flex items-center rounded-md border bg-secondary px-2 py-0.5 font-medium text-secondary-foreground tabular-nums">
+          Score {score}
+        </span>
+        <span className="text-muted-foreground tabular-nums">Best {high}</span>
+      </div>
+
+      {/* Responsive playfield */}
+      <div
+        ref={playfieldRef}
+        className="relative aspect-[8/3] w-full overflow-hidden rounded-lg border bg-background"
+      >
+        <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full touch-none" />
+
+        {/* Overlay */}
+        {status !== "playing" && (
+          <div className="absolute inset-0 grid place-items-center bg-background/80 backdrop-blur-[1px]">
+            <div className="flex flex-col items-center gap-3 px-6 text-center">
+              {status === "gameover" ? (
+                <>
+                  <p className="font-semibold text-lg">Game over</p>
+                  <p className="text-muted-foreground text-sm">
+                    You scored {score}
+                    {score >= high && score > 0 ? " — new best!" : ""}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-lg">Dino Runner</p>
+                  <p className="text-muted-foreground text-sm">
+                    Space / Up / W to jump. Down / S to duck.
+                  </p>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={start}
+                className={cn(
+                  "inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 font-medium text-primary-foreground text-sm",
+                  "transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                )}
+              >
+                {status === "gameover" ? "Play again" : "Start"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Accessible live region */}
+      <div aria-live="polite" className="sr-only">
+        {status === "playing" ? `Score: ${score}` : null}
+        {status === "gameover" ? `Game over. Final score: ${score}. Best: ${high}.` : null}
+      </div>
+    </div>
+  );
+}
+
+export default DinoRunner;

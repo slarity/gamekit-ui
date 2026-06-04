@@ -1,0 +1,106 @@
+import { notFound } from "next/navigation";
+import type { ComponentType, ReactNode } from "react";
+import { DocsSidebar, type DocsNavGroup } from "@/components/docs/sidebar";
+import { DocsToc } from "@/components/docs/toc";
+import { mdxComponents } from "@/components/mdx";
+import { GameStructuredData } from "@/components/structured-data";
+import { source } from "@/lib/source";
+
+type MdxPageData = {
+  title?: string;
+  description?: string;
+  body: ComponentType<{ components?: typeof mdxComponents }>;
+  toc: { title: ReactNode; url: string; depth: number }[];
+};
+
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return source.generateParams();
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug?: string[] }> }) {
+  const { slug } = await params;
+  const page = source.getPage(slug);
+  if (!page) return {};
+  const path = `/${["docs", ...(slug ?? [])].join("/")}`;
+  return {
+    title: page.data.title,
+    description: page.data.description,
+    alternates: { canonical: path },
+    openGraph: {
+      title: `${page.data.title} — GameKit UI`,
+      description: page.data.description,
+      url: path,
+    },
+  };
+}
+
+function navGroups(): DocsNavGroup[] {
+  const pages = source.getPages();
+  const order = ["/docs", "/docs/installation"];
+  const intro = pages
+    .filter((p) => !p.url.startsWith("/docs/games/"))
+    .sort((a, b) => {
+      const ai = order.indexOf(a.url);
+      const bi = order.indexOf(b.url);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+  const games = pages
+    .filter((p) => p.url.startsWith("/docs/games/"))
+    .sort((a, b) => (a.data.title ?? "").localeCompare(b.data.title ?? ""));
+
+  const groups: DocsNavGroup[] = [
+    { title: "Getting Started", items: intro.map((p) => ({ title: p.data.title ?? p.url, url: p.url })) },
+  ];
+  if (games.length > 0) {
+    groups.push({ title: "Games", items: games.map((p) => ({ title: p.data.title ?? p.url, url: p.url })) });
+  }
+  return groups;
+}
+
+export default async function DocsPage({ params }: { params: Promise<{ slug?: string[] }> }) {
+  const { slug } = await params;
+  const page = source.getPage(slug);
+  if (!page) notFound();
+
+  const data = page.data as unknown as MdxPageData;
+  const MDX = data.body;
+  const toc = data.toc;
+  const gameName = slug?.[0] === "games" ? slug[1] : undefined;
+
+  return (
+    <div className="container mx-auto max-w-6xl px-4">
+      {gameName ? <GameStructuredData name={gameName} /> : null}
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-[14rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)_14rem]">
+        {/* Sidebar */}
+        <aside className="hidden md:block">
+          <div className="sticky top-20 max-h-[calc(100svh-6rem)] overflow-y-auto py-10 pr-2">
+            <DocsSidebar groups={navGroups()} />
+          </div>
+        </aside>
+
+        {/* Content */}
+        <main className="min-w-0 py-10">
+          <div className="mb-8 space-y-2">
+            <h1 className="font-semibold text-3xl tracking-tight">{page.data.title}</h1>
+            {page.data.description ? (
+              <p className="text-lg text-muted-foreground">{page.data.description}</p>
+            ) : null}
+          </div>
+          <div className="mdx">
+            <MDX components={mdxComponents} />
+          </div>
+        </main>
+
+        {/* TOC */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-20 max-h-[calc(100svh-6rem)] overflow-y-auto py-10 pl-2">
+            <DocsToc items={toc} />
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}

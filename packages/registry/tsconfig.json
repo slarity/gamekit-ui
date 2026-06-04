@@ -1,0 +1,14 @@
+{
+  "extends": "@gamekitui/config/tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": [],
+    "noUnusedLocals": false,
+    "paths": {
+      "@/lib/utils": ["../ui/src/lib/utils.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

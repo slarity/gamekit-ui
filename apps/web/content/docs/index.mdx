@@ -1,0 +1,24 @@
+---
+title: Introduction
+description: GameKit UI is an open-source shadcn registry of minimal, themeable, drop-in browser games. Install any game with the shadcn CLI — zero dependencies, zero assets.
+---
+
+**GameKit UI** is an open-source registry of minimal, themeable browser games packaged as React/TSX components. Drop one into a 404 page, an empty state, a loading screen, or a landing-page easter egg — it installs with the shadcn CLI and inherits your theme automatically.
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/snake.json
+```
+
+No provider. No peer deps. No init step.
+
+## Principles
+
+- **Minimal** — each game is a single drop-in file with zero npm dependencies beyond `react` and your existing `cn` helper.
+- **Themeable** — the theme's `--primary` / `--secondary` / `--accent` drive the *playfield*, not just the chrome. Change your theme and the games recolor.
+- **Zero assets** — no images, audio, or fonts. Every pixel is drawn with CSS or `<canvas>`.
+- **Accessible** — keyboard + touch input, focus rings, `aria-live` announcements, and `prefers-reduced-motion` support in every game.
+
+## Next steps
+
+- [Installation](/docs/installation) — set up the registry and install your first game.
+- [Games](/games) — browse the full lineup with live previews.

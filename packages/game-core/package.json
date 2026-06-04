@@ -1,0 +1,22 @@
+{
+  "name": "@gamekitui/game-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared contract types for gamekitui games (zero runtime).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@gamekitui/config": "workspace:*",
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  }
+}

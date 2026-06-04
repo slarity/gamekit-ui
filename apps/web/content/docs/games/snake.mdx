@@ -1,0 +1,26 @@
+---
+title: Snake
+description: A tiny, themeable Snake game. ≤6KB gzipped, zero external assets.
+---
+
+A tiny, themeable Snake game. ≤6KB gzipped, zero external assets.
+
+<ComponentPreview name="snake" />
+
+<GameInfo name="snake" />
+
+## Theming
+
+This is a canvas game. Its playfield is driven by your shadcn `--primary`, `--secondary`, and `--accent` tokens — read at runtime and re-resolved when you toggle dark mode or swap a theme preset. Change your theme and Snake recolors with it. Try the **Customize** button in the corner.
+
+## Install
+
+```bash
+npx shadcn@latest add https://gamekitui.com/r/snake.json
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<Snake className="mx-auto w-full max-w-sm" />
+```
