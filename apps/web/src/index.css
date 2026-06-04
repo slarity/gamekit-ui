@@ -26,3 +26,128 @@
   color: var(--shiki-dark) !important;
   background-color: var(--shiki-dark-bg) !important;
 }
+
+/* ============================================================
+   Arcade chrome 👾 — landing-page CRT treatment
+   Scoped to explicit classes so docs/games stay clean.
+   ============================================================ */
+
+/* Pixel chrome typography — wordmark, marquees, "insert coin". Never body copy. */
+.pixel {
+  font-family: var(--font-pixel);
+  letter-spacing: 0;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+/* Faint CRT dot-field, masked to fade out — for hero/section backdrops. */
+.arcade-dots {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--foreground) 9%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 22px 22px;
+  background-position: -1px -1px;
+  -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 35%, transparent 85%);
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 35%, transparent 85%);
+}
+
+/* CRT screen — vignette + scanlines, for game panels. */
+.crt-screen {
+  position: relative;
+  overflow: hidden;
+  background: oklch(0.13 0.012 260);
+}
+.crt-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 130% at 50% 50%,
+    transparent 58%,
+    color-mix(in oklab, #000 60%, transparent) 100%
+  );
+}
+.crt-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, #000 22%, transparent) 0 1px,
+    transparent 1px 3px
+  );
+  opacity: 0.4;
+}
+
+/* Notched-corner "pixel" frame. */
+.pixel-frame {
+  --notch: 7px;
+  clip-path: polygon(
+    0 var(--notch), var(--notch) var(--notch), var(--notch) 0,
+    calc(100% - var(--notch)) 0, calc(100% - var(--notch)) var(--notch), 100% var(--notch),
+    100% calc(100% - var(--notch)), calc(100% - var(--notch)) calc(100% - var(--notch)),
+    calc(100% - var(--notch)) 100%,
+    var(--notch) 100%, var(--notch) calc(100% - var(--notch)), 0 calc(100% - var(--notch))
+  );
+}
+
+/* Pixel space-invader sprite — 11×8 grid, cells = currentColor. */
+.invader {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  image-rendering: pixelated;
+}
+.invader i {
+  width: 100%;
+  aspect-ratio: 1;
+}
+.invader i.on {
+  background: currentColor;
+}
+
+/* Attract-mode marquee. */
+.marquee {
+  overflow: hidden;
+  position: relative;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: arcade-scrollx 34s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes arcade-scrollx {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Blinking cursor / "press start". */
+.blink {
+  animation: arcade-blink 1.06s steps(1) infinite;
+}
+@keyframes arcade-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .blink {
+    animation: none;
+  }
+}

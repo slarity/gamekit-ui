@@ -17,6 +17,15 @@ export interface GameProps {
   paused?: boolean;
   /** Auto-focus on mount so keyboard works. */
   autoFocus?: boolean;
+  /**
+   * When true (the default), the game listens for keyboard input on `window` so
+   * it responds without being focused first — ideal for single-game pages (404s,
+   * loading/empty states). Set false when multiple games share a page, or the
+   * game sits in scrollable content, so it only responds while focused (and
+   * doesn't capture the page's scroll keys). Ignores keystrokes aimed at form
+   * fields.
+   */
+  captureGlobalKeys?: boolean;
   /** localStorage key (or default per-game) for high score persistence. */
   persistHighScore?: boolean | string;
   /** Override keyboard mapping. */

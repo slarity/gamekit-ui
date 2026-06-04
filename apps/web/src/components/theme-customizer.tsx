@@ -68,6 +68,35 @@ function read(): Settings {
   return DEFAULTS;
 }
 
+const THEME_EVENT = "gamekitui:theme";
+
+function persist(settings: Settings) {
+  apply(settings);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new CustomEvent<Settings>(THEME_EVENT, { detail: settings }));
+}
+
+/** Recolor the live theme to a hue (or null for neutral). Single source of truth,
+ * shared by the floating customizer and the landing-page "theme it live" swatches. */
+export function setAccentHue(hue: number | null) {
+  persist({ ...read(), hue });
+}
+
+export function getAccentHue(): number | null {
+  return read().hue;
+}
+
+/** Subscribe to live-theme changes from anywhere. Returns an unsubscribe fn. */
+export function onThemeChange(cb: (s: Settings) => void): () => void {
+  const handler = (e: Event) => cb((e as CustomEvent<Settings>).detail);
+  window.addEventListener(THEME_EVENT, handler);
+  return () => window.removeEventListener(THEME_EVENT, handler);
+}
+
 const PRESETS: { name: string; hue: number | null; swatch: string }[] = [
   { name: "Neutral", hue: null, swatch: "oklch(0.45 0 0)" },
   { name: "Blue", hue: 256, swatch: "oklch(0.62 0.19 256)" },
@@ -129,16 +158,13 @@ export function ThemeCustomizer() {
   React.useEffect(() => {
     setSettings(read());
     setMounted(true);
+    // Stay in sync when the hero swatches (or any caller) change the theme.
+    return onThemeChange(setSettings);
   }, []);
 
   const update = React.useCallback((next: Settings) => {
     setSettings(next);
-    apply(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
-    }
+    persist(next);
   }, []);
 
   const reset = React.useCallback(() => {

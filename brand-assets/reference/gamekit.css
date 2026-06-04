@@ -1,0 +1,287 @@
+/* ============================================================
+   GameKit UI — Arcade brand system 👾
+   Shared tokens + arcade chrome utilities
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Press+Start+2P&display=swap');
+
+:root {
+  /* ---- surfaces (deep CRT blue-black, never flat #000) ---- */
+  --bg:        oklch(0.155 0.012 260);
+  --bg-1:      oklch(0.185 0.014 260);
+  --bg-2:      oklch(0.215 0.016 262);
+  --bg-3:      oklch(0.255 0.018 262);
+  --line:      oklch(0.320 0.018 262);
+  --line-soft: oklch(0.270 0.016 262);
+
+  /* ---- ink ---- */
+  --ink:       oklch(0.972 0.004 250);
+  --ink-dim:   oklch(0.760 0.010 255);
+  --ink-faint: oklch(0.560 0.014 258);
+
+  /* ---- arcade accents (CRT phosphor) ---- */
+  --green:   oklch(0.872 0.205 148);
+  --green-d: oklch(0.640 0.165 150);
+  --magenta: oklch(0.720 0.250 350);
+  --cyan:    oklch(0.840 0.135 205);
+  --amber:   oklch(0.840 0.155 78);
+
+  /* ---- the live accent (swappable via Tweaks) ---- */
+  --accent:     var(--green);
+  --accent-d:   var(--green-d);
+  --accent-ink: oklch(0.180 0.060 150);   /* readable text ON accent */
+  --glow: 0 0 0 1px color-mix(in oklab, var(--accent) 55%, transparent),
+          0 0 28px -6px color-mix(in oklab, var(--accent) 70%, transparent);
+
+  /* ---- type ---- */
+  --sans:  'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --mono:  'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --pixel: 'Press Start 2P', var(--mono);
+
+  /* ---- rhythm ---- */
+  --r:   10px;
+  --r-s: 6px;
+  --maxw: 1200px;
+
+  --scanline-alpha: 0.05;
+  --crt: 1;            /* 1 = curvature/vignette on game panels */
+}
+
+/* ============================================================ base */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+h1,h2,h3,h4 { margin: 0; font-weight: 700; letter-spacing: -0.025em; line-height: 1.02; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+img, canvas { display: block; }
+::selection { background: color-mix(in oklab, var(--accent) 35%, transparent); color: var(--ink); }
+
+/* faint dotted CRT field on the page */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(color-mix(in oklab, var(--ink) 9%, transparent) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  background-position: -1px -1px;
+  opacity: 0.5;
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 35%, transparent 85%);
+}
+
+/* global scanline veil */
+.scanlines body, body.scanlines::after { }
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, #000 calc(var(--scanline-alpha) * 100%), transparent) 0 1px,
+    transparent 1px 3px);
+  mix-blend-mode: multiply;
+  opacity: 1;
+}
+body[data-scanlines="off"]::after { display: none; }
+
+/* ============================================================ layout */
+.wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: 28px; position: relative; z-index: 1; }
+.section { position: relative; z-index: 1; }
+
+/* ============================================================ typography utilities */
+.pixel { font-family: var(--pixel); letter-spacing: 0; line-height: 1.6; text-transform: uppercase; }
+.mono  { font-family: var(--mono); }
+.eyebrow {
+  font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint);
+}
+.accent { color: var(--accent); }
+.dim { color: var(--ink-dim); }
+
+/* ============================================================ pixel-stepped cabinet frame */
+.cabinet {
+  position: relative;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+/* notched-corner "pixel" frame variant */
+.pixelframe {
+  --notch: 7px;
+  clip-path: polygon(
+    0 var(--notch), var(--notch) var(--notch), var(--notch) 0,
+    calc(100% - var(--notch)) 0, calc(100% - var(--notch)) var(--notch), 100% var(--notch),
+    100% calc(100% - var(--notch)), calc(100% - var(--notch)) calc(100% - var(--notch)), calc(100% - var(--notch)) 100%,
+    var(--notch) 100%, var(--notch) calc(100% - var(--notch)), 0 calc(100% - var(--notch))
+  );
+  border-radius: 0;
+}
+
+/* ============================================================ buttons */
+.btn {
+  --b: var(--ink);
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--sans); font-size: 14.5px; font-weight: 600;
+  padding: 12px 18px; border-radius: var(--r-s);
+  border: 1px solid var(--line);
+  background-color: var(--bg-2); color: var(--ink);
+  cursor: pointer; transition: transform .12s ease, border-color .15s ease, filter .15s ease;
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-1px); border-color: var(--line); background-color: var(--bg-3); }
+.btn:active { transform: translateY(0); }
+.btn-primary {
+  background-color: var(--accent); color: var(--accent-ink);
+  border-color: transparent; box-shadow: var(--glow);
+}
+.btn-primary:hover { background-color: var(--accent); filter: brightness(1.06); box-shadow: var(--glow); }
+.btn-ghost { background-color: transparent; }
+.btn .k { font-family: var(--mono); font-size: 12px; }
+
+/* ============================================================ pills / chips */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+  padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px;
+  background: color-mix(in oklab, var(--bg-1) 70%, transparent);
+}
+.pill .dot { width: 7px; height: 7px; border-radius: 2px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+/* ============================================================ install / code line */
+.cmd {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--mono); font-size: 13.5px;
+  background: var(--bg-1); border: 1px solid var(--line);
+  border-radius: var(--r-s); padding: 12px 12px 12px 16px;
+  color: var(--ink);
+}
+.cmd .prompt { color: var(--accent); user-select: none; }
+.cmd code { flex: 1; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.cmd code::-webkit-scrollbar { display: none; }
+.cmd .copy {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex: none; border-radius: 6px;
+  border: 1px solid var(--line); background-color: var(--bg-2); color: var(--ink-dim);
+  cursor: pointer; transition: color .14s ease, border-color .14s ease;
+}
+.cmd .copy:hover { color: var(--ink); border-color: var(--accent); }
+.cmd .copy.ok { color: var(--accent-ink); background-color: var(--accent); border-color: transparent; }
+
+/* ============================================================ CRT screen (for game panels) */
+.crt {
+  position: relative; overflow: hidden;
+  background: oklch(0.13 0.012 260);
+  border-radius: 8px;
+}
+.crt::before {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background:
+    radial-gradient(120% 130% at 50% 50%, transparent 58%, color-mix(in oklab, #000 60%, transparent) 100%);
+  opacity: var(--crt);
+}
+.crt::after {
+  content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  background: repeating-linear-gradient(to bottom,
+    color-mix(in oklab, #000 22%, transparent) 0 1px, transparent 1px 3px);
+  opacity: calc(var(--crt) * 0.6);
+}
+
+/* ============================================================ HUD */
+.hud {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em;
+}
+.hud .label { color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.16em; font-size: 10px; }
+.hud .num { font-variant-numeric: tabular-nums; font-size: 18px; color: var(--accent); font-weight: 600; }
+
+/* ============================================================ pixel invader sprite */
+.invader {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 0;
+  image-rendering: pixelated;
+}
+.invader i { width: 100%; aspect-ratio: 1; }
+.invader i.on { background: currentColor; }
+.invader.glow i.on { box-shadow: 0 0 6px color-mix(in oklab, currentColor 70%, transparent); }
+
+/* marching animation: swap between two frames */
+@keyframes march { 0%,49% { opacity: 1 } 50%,100% { opacity: 0 } }
+
+/* ============================================================ blinking cursor / press start */
+.blink { animation: blink 1.06s steps(1) infinite; }
+@keyframes blink { 0%,50% { opacity: 1 } 50.01%,100% { opacity: 0 } }
+
+/* ============================================================ marquee (attract mode) */
+.marquee { overflow: hidden; position: relative; }
+.marquee-track { display: flex; gap: 0; width: max-content; animation: scrollx 32s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes scrollx { to { transform: translateX(-50%); } }
+
+/* ============================================================ section divider w/ label */
+.rule {
+  display: flex; align-items: center; gap: 16px;
+  color: var(--ink-faint);
+}
+.rule::before, .rule::after { content: ""; height: 1px; background: var(--line-soft); flex: 1; }
+
+/* ============================================================ swatch row */
+.swatch {
+  width: 28px; height: 28px; border-radius: 6px; cursor: pointer; flex: none;
+  border: 1px solid color-mix(in oklab, #fff 16%, transparent);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.swatch:hover { transform: translateY(-2px); }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px currentColor; }
+
+/* ============================================================ tweaks panel */
+.tweaks {
+  position: fixed; right: 18px; bottom: 18px; z-index: 9500;
+  width: 268px; background: color-mix(in oklab, var(--bg-1) 92%, #000);
+  border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 30px 70px -30px #000, var(--glow);
+  font-family: var(--sans); overflow: hidden;
+  transform-origin: bottom right;
+  animation: twin .18s ease;
+}
+@keyframes twin { from { opacity: 0; transform: translateY(8px) scale(.97);} }
+.tweaks[hidden] { display: none; }
+.tweaks-h {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 12px 14px; border-bottom: 1px solid var(--line-soft);
+}
+.tweaks-h .t { font-family: var(--pixel); font-size: 11px; color: var(--accent); }
+.tweaks-h .x { background:none; border:none; color: var(--ink-faint); cursor:pointer; font-size:18px; line-height:1; padding:2px 4px; border-radius:5px; }
+.tweaks-h .x:hover { color: var(--ink); background: var(--bg-2); }
+.tw-body { padding: 6px 14px 14px; }
+.tw-sec { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); margin: 16px 0 10px; }
+.tw-sec:first-child { margin-top: 8px; }
+.tw-swatches { display:flex; gap: 9px; }
+.tw-row { display:flex; align-items:center; justify-content:space-between; padding: 7px 0; }
+.tw-row .lab { font-size: 13.5px; color: var(--ink-dim); }
+.tw-switch {
+  width: 40px; height: 23px; border-radius: 999px; border:1px solid var(--line);
+  background: var(--bg-3); position:relative; cursor:pointer; transition: background .15s, border-color .15s; flex:none;
+}
+.tw-switch::after { content:""; position:absolute; top:2px; left:2px; width:17px; height:17px; border-radius:50%; background: var(--ink-dim); transition: transform .16s ease, background .16s; }
+.tw-switch[aria-checked="true"] { background: color-mix(in oklab, var(--accent) 35%, var(--bg-3)); border-color: transparent; }
+.tw-switch[aria-checked="true"]::after { transform: translateX(17px); background: var(--accent); }
+
+/* ============================================================ misc */
+.grid { display: grid; }
+.flex { display: flex; }
+.reduced-ok { }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+  .blink { animation: none; }
+}

@@ -12,7 +12,8 @@ function ComponentPreview({ name }: { name: string }) {
     <div className="not-prose my-6 overflow-hidden rounded-lg ring-1 ring-foreground/10">
       <div className="grid place-items-center bg-dots p-6">
         <div className="mx-auto w-full max-w-[380px]">
-          <GamePreview name={name} autoFocus={false} />
+          {/* Embedded in a scrollable docs page — focus-scope keys so they don't hijack scroll. */}
+          <GamePreview name={name} autoFocus={false} captureGlobalKeys={false} />
         </div>
       </div>
       <div className="border-t bg-card p-3">

@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono, Press_Start_2P } from "next/font/google";
+import Script from "next/script";
 
 import "../index.css";
 import Header from "@/components/header";
@@ -19,6 +20,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Press Start 2P — arcade chrome ONLY (wordmark, marquees, "insert coin"). Never body copy.
+const pressStart = Press_Start_2P({
+  variable: "--font-press-start",
+  weight: "400",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
@@ -30,6 +38,7 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.author }],
   creator: siteConfig.author,
   applicationName: siteConfig.name,
+  manifest: "/site.webmanifest",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -56,6 +65,11 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  // CRT blue-black — matches favicon tile + manifest theme/background.
+  themeColor: "#0d0e13",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -63,8 +77,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${pressStart.variable} antialiased`}
+      >
         <StructuredData />
+        {/* Umami — privacy-friendly, cookieless analytics. Loaded after hydration. */}
+        <Script
+          defer
+          strategy="afterInteractive"
+          src="https://cloud.umami.is/script.js"
+          data-website-id="4d863adc-d357-4a78-83fe-4f94484c78e7"
+        />
         <Providers>
           <ThemeCustomizerInit />
           <div className="flex min-h-svh flex-col">

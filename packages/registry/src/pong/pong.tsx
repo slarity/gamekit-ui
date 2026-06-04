@@ -130,6 +130,14 @@ export interface PongProps {
   height?: number;
   paused?: boolean;
   autoFocus?: boolean;
+  /**
+   * When true (the default), the game listens for keys on `window` so it works
+   * without being focused first — ideal for single-game pages (404s, loading /
+   * empty states). Set false when multiple games share a page, or the game sits
+   * in scrollable content, so it only responds while focused. Ignores keys aimed
+   * at form fields.
+   */
+  captureGlobalKeys?: boolean;
   persistHighScore?: boolean | string;
   onScoreChange?: (score: number) => void;
   onGameOver?: (r: { score: number; won: boolean }) => void;
@@ -141,6 +149,7 @@ export function Pong({
   width,
   paused = false,
   autoFocus = true,
+  captureGlobalKeys = true,
   persistHighScore: _persistHighScore,
   onScoreChange,
   onGameOver,
@@ -486,6 +495,9 @@ export function Pong({
   // Keyboard
   React.useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      // In global mode, ignore keys aimed at form fields / editable content.
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
       const gameKeys = new Set(["ArrowUp", "ArrowDown", "w", "s", "W", "S"]);
       if (gameKeys.has(e.key)) {
         e.preventDefault();
@@ -499,14 +511,18 @@ export function Pong({
     const onKeyUp = (e: KeyboardEvent) => {
       keysRef.current.delete(e.key);
     };
-    const el = wrapperRef.current;
-    el?.addEventListener("keydown", onKeyDown);
-    el?.addEventListener("keyup", onKeyUp);
+    // Single-game pages can opt into window-level capture so keys work without
+    // focusing the game; otherwise listen on the wrapper (focus-scoped).
+    const target: Window | HTMLElement | null = captureGlobalKeys
+      ? window
+      : wrapperRef.current;
+    target?.addEventListener("keydown", onKeyDown as EventListener);
+    target?.addEventListener("keyup", onKeyUp as EventListener);
     return () => {
-      el?.removeEventListener("keydown", onKeyDown);
-      el?.removeEventListener("keyup", onKeyUp);
+      target?.removeEventListener("keydown", onKeyDown as EventListener);
+      target?.removeEventListener("keyup", onKeyUp as EventListener);
     };
-  }, [start]);
+  }, [start, captureGlobalKeys]);
 
   // Pointer / touch drag for player paddle
   React.useEffect(() => {
@@ -556,7 +572,9 @@ export function Pong({
       style={width ? { maxWidth: width } : undefined}
       className={cn(
         "relative flex w-full select-none flex-col gap-2 outline-none",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        // Focus ring only matters when keys are focus-scoped; global capture hides it.
+        !captureGlobalKeys &&
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
     >
