@@ -357,8 +357,8 @@ export function Snake({
         ctx.fill();
       };
 
-      // food (accent)
-      rect(s.food.x, s.food.y, t.accent || "#f00");
+      // food (destructive — a contrasting accent, distinct from the primary snake)
+      rect(s.food.x, s.food.y, t.destructive || "#f00");
 
       // snake body (primary), head a brighter shade
       for (let i = s.snake.length - 1; i >= 0; i--) {

@@ -369,7 +369,7 @@ export function DinoRunner({
     const drawObstacle = (t: ThemeTokens, obs: Obstacle) => {
       const x = obs.x;
       const y = groundY - obs.h;
-      const cactusColor = t.secondary || "#555";
+      const cactusColor = t["muted-foreground"] || "#555";
 
       // main stem
       roundRect(x, y, obs.w, obs.h, 3, cactusColor);
@@ -385,7 +385,7 @@ export function DinoRunner({
     };
 
     const drawGround = (t: ThemeTokens) => {
-      ctx.strokeStyle = t.accent || "#888";
+      ctx.strokeStyle = t["muted-foreground"] || "#888";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, groundY);
@@ -393,7 +393,7 @@ export function DinoRunner({
       ctx.stroke();
 
       // scrolling tick marks
-      ctx.strokeStyle = t.accent || "#888";
+      ctx.strokeStyle = t["muted-foreground"] || "#888";
       ctx.lineWidth = 1;
       ctx.globalAlpha = 0.4;
       const spacing = 40;

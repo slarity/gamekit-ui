@@ -356,19 +356,13 @@ export function Breakout({
         const bx = sideMargin + brick.col * (brickW + BRICK_GAP);
         const by = topMargin + brick.row * (brickH + BRICK_GAP);
 
-        // Row 0 gets accent, rows alternate secondary / muted tones.
-        let fill: string;
-        if (brick.row === 0) {
-          fill = `oklch(${t.accent})`;
-        } else if (brick.row % 2 === 1) {
-          fill = `oklch(${t.secondary})`;
-        } else {
-          fill = `oklch(${t.muted})`;
-        }
-        // Fallback if token is empty.
-        if (!t.accent && brick.row === 0) fill = "#f97316";
-        if (!t.secondary && brick.row % 2 === 1) fill = "#e2e8f0";
-        if (!t.muted && brick.row % 2 === 0 && brick.row !== 0) fill = "#cbd5e1";
+        // Alternating primary / muted-foreground bricks — themeable and visible
+        // on both light and dark backgrounds. (Tokens are already full color
+        // strings like "oklch(…)", so use them directly — no extra wrapping.)
+        const fill =
+          brick.row % 2 === 0
+            ? t.primary || "#3b82f6"
+            : t["muted-foreground"] || "#64748b";
 
         drawRoundRect(bx, by, brickW, brickH, 3, fill);
 
@@ -383,11 +377,11 @@ export function Breakout({
 
       // Paddle.
       const paddleY = LOGH - PADDLE_HEIGHT - 10;
-      const pFill = t.primary ? `oklch(${t.primary})` : "#3b82f6";
+      const pFill = t.primary || "#3b82f6";
       drawRoundRect(gs.paddle.x, paddleY, gs.paddle.width, PADDLE_HEIGHT, 5, pFill);
 
       // Ball.
-      const bFill = t.primary ? `oklch(${t.primary})` : "#3b82f6";
+      const bFill = t.primary || "#3b82f6";
       ctx.fillStyle = bFill;
       ctx.beginPath();
       ctx.arc(gs.ball.x, gs.ball.y, BALL_RADIUS, 0, Math.PI * 2);

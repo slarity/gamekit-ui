@@ -283,8 +283,8 @@ export function Pong({
       const now = performance.now();
       const flashActive = gs && (now - gs.pointFlash) < 400;
       const midLineColor = flashActive
-        ? t.accent || "#ff0"
-        : t.muted || "rgba(255,255,255,0.15)";
+        ? t.primary || "#ff0"
+        : t["muted-foreground"] || "rgba(255,255,255,0.15)";
       ctx.strokeStyle = midLineColor;
       ctx.lineWidth = 1;
       ctx.setLineDash([6, 6]);
@@ -306,14 +306,14 @@ export function Pong({
         t.primary || "#fff",
       );
 
-      // CPU paddle (right) — secondary
+      // CPU paddle (right) — muted-foreground (visible on both light/dark, distinct from the primary player)
       drawRoundRect(
         LOGW - PADDLE_MARGIN - PADDLE_W,
         gs.cpuY,
         PADDLE_W,
         PADDLE_H,
         PADDLE_RADIUS,
-        t.secondary || "#888",
+        t["muted-foreground"] || "#888",
       );
 
       // Ball — primary (rounded square)

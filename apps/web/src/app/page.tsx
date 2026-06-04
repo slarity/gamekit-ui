@@ -168,7 +168,8 @@ export default function Home() {
             ))}
           </ol>
 
-          <div className="overflow-hidden rounded-lg border bg-card">
+          {/* Dark "terminal" panel in both modes so the phosphor syntax colors stay readable. */}
+          <div className="dark overflow-hidden rounded-lg border bg-card text-foreground">
             <div className="flex items-center gap-2 border-b px-4 py-3 font-mono text-[11px] text-muted-foreground">
               <span className="flex gap-1.5">
                 <span className="size-2.5 rounded-full bg-muted-foreground/30" />

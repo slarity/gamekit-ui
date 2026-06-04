@@ -17,7 +17,8 @@ const INVADER_COLORS = [
 export function CtaBand() {
   return (
     <section className="container mx-auto max-w-6xl px-4 pt-8 pb-24">
-      <div className="relative overflow-hidden rounded-2xl border bg-card px-7 py-16 text-center">
+      {/* Dark arcade marquee in both modes so the phosphor invaders + glow read clearly. */}
+      <div className="dark relative overflow-hidden rounded-2xl border bg-card px-7 py-16 text-center text-foreground">
         <div
           className="pointer-events-none absolute inset-0"
           style={{

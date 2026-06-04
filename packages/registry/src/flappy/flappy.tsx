@@ -326,7 +326,7 @@ export function Flappy({
         const topH = pipe.gapY - PIPE_GAP / 2;
         const botY = pipe.gapY + PIPE_GAP / 2;
         const botH = playH - botY;
-        const pipeColor = t.secondary || "#888";
+        const pipeColor = t["muted-foreground"] || "#888";
         const r = 4;
         // Top pipe
         if (topH > 0) drawRoundRect(pipe.x, 0, PIPE_WIDTH, topH, r, pipeColor);
@@ -338,13 +338,13 @@ export function Flappy({
       ctx.fillStyle = t.border || t.muted || "#ccc";
       ctx.fillRect(0, playH, LOGW, GROUND_H);
       // Ground line
-      ctx.fillStyle = t.muted || "#aaa";
+      ctx.fillStyle = t["muted-foreground"] || "#aaa";
       ctx.fillRect(0, playH, LOGW, 2);
 
-      // Score blip overlay (accent)
+      // Score blip overlay (themed flash)
       if (live.blipAlpha > 0) {
         ctx.globalAlpha = live.blipAlpha * 0.18;
-        ctx.fillStyle = t.accent || "#ff0";
+        ctx.fillStyle = t.primary || "#ff0";
         ctx.fillRect(0, 0, LOGW, LOGH);
         ctx.globalAlpha = 1;
       }
