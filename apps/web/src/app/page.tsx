@@ -9,6 +9,7 @@ import { Cabinet } from "@/components/landing/cabinet";
 import { CtaBand } from "@/components/landing/cta-band";
 import { arcadeGlow } from "@/components/landing/cta-styles";
 import { Lineup } from "@/components/landing/lineup";
+import { PlayableGames } from "@/components/landing/playable-games";
 import { ThemeSwatches } from "@/components/landing/theme-swatches";
 import { InstallCommand } from "@/components/install-command";
 import { GAMES } from "@/registry/games";
@@ -57,7 +58,7 @@ export default function Home() {
                   zero deps
                 </Badge>
                 <Badge variant="outline" className="font-mono font-normal text-muted-foreground flex items-center">
-                  <span className="mt-4">≤</span> 6KB gzipped
+                  <span className="mt-1">≤</span> 6KB gzipped
                 </Badge>
               </div>
 
@@ -124,6 +125,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* ============ PLAYABLE ============ */}
+      <PlayableGames />
 
       {/* ============ LINEUP ============ */}
       <Lineup />

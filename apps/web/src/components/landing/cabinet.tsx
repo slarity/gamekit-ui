@@ -1,9 +1,9 @@
 import { GamePreview } from "@/components/game-preview";
 
 /**
- * CRT arcade cabinet that frames the live, themeable Snake. The game brings its
- * own start button / score, so the cabinet only adds chrome: marquee, screen
- * glass, and a footer hint.
+ * CRT arcade cabinet that frames the live, themeable featured game. The screen
+ * keeps a fixed widescreen ratio and vertically centers the game, so a wide
+ * game (Dino Runner) reads like a real arcade monitor instead of a thin strip.
  */
 export function Cabinet() {
   return (
@@ -11,16 +11,16 @@ export function Cabinet() {
       {/* Marquee */}
       <div className="flex items-center justify-between px-2 pt-1 pb-3 font-pixel text-[10px] text-muted-foreground">
         <span>
-          <span className="text-primary">GAMEKIT</span> // SNAKE
+          <span className="text-primary">GAMEKIT</span> // DINO RUNNER
         </span>
         <span className="blink text-primary">●</span>
       </div>
 
-      {/* Screen */}
-      <div className="crt-screen rounded-lg">
-        <div className="relative z-[1] p-2">
+      {/* Screen — fixed ratio, game centered */}
+      <div className="crt-screen flex aspect-video items-center justify-center rounded-lg p-3">
+        <div className="relative z-[1] w-full">
           {/* Decorative on a scrollable page — click to play; don't capture scroll keys. */}
-          <GamePreview name="snake" autoFocus={false} captureGlobalKeys={false} />
+          <GamePreview name="dino-runner" autoFocus={false} captureGlobalKeys={false} />
         </div>
       </div>
 
