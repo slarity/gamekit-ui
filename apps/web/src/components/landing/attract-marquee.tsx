@@ -13,7 +13,10 @@ export function AttractMarquee() {
             key={`${game.name}-${i}`}
             className="flex items-center gap-3.5 whitespace-nowrap px-6 font-pixel text-[13px] text-muted-foreground leading-none"
           >
-            <span className="text-primary">▸</span>
+            <span
+              aria-hidden="true"
+              className="size-0 border-y-[3.5px] border-y-transparent border-l-[6px] border-l-primary"
+            />
             {game.title}
             <span className="size-1.5 bg-muted-foreground/50" />
           </span>
