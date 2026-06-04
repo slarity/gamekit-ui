@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install GameKit UI games with the shadcn CLI — by registry URL or the @gamekit namespace. Includes the usage pattern and the shared props every game accepts.
+description: Install GameKit UI games with the shadcn CLI — by registry URL or the @gamekitui namespace. Includes the usage pattern and the shared props every game accepts.
 ---
 
 ## Install a game
@@ -15,18 +15,18 @@ The CLI writes the component into your project and rewrites the `cn` import to y
 
 ## Register the namespace (optional)
 
-Add the `@gamekit` namespace to your `components.json` to install games by short name:
+Add the `@gamekitui` namespace to your `components.json` to install games by short name:
 
 ```json
 {
   "registries": {
-    "@gamekit": "https://gamekitui.com/r/{name}.json"
+    "@gamekitui": "https://gamekitui.com/r/{name}.json"
   }
 }
 ```
 
 ```bash
-npx shadcn@latest add @gamekit/snake
+npx shadcn@latest add @gamekitui/snake
 ```
 
 ## Use it

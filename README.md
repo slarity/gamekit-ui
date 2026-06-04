@@ -98,18 +98,18 @@ const Snake = dynamic(() => import("@/components/games/snake").then((m) => m.Sna
 
 ### Namespace install (optional)
 
-Register the `@gamekit` namespace in your `components.json`:
+Register the `@gamekitui` namespace in your `components.json`:
 
 ```jsonc
 {
   "registries": {
-    "@gamekit": "https://gamekitui.com/r/{name}.json"
+    "@gamekitui": "https://gamekitui.com/r/{name}.json"
   }
 }
 ```
 
 ```bash
-npx shadcn@latest add @gamekit/snake
+npx shadcn@latest add @gamekitui/snake
 ```
 
 ## ⚙️ Shared props

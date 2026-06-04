@@ -24,7 +24,7 @@ export const siteConfig = {
   ],
   github: "https://github.com/slarity/gamekit-ui",
   author: "GameKit UI contributors",
-  registryNamespace: "@gamekit",
+  registryNamespace: "@gamekitui",
 } as const;
 
 export type SiteConfig = typeof siteConfig;
