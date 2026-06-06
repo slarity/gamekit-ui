@@ -9,7 +9,7 @@ export function GET() {
   const games = GAMES.filter((g) => g.ready)
     .map(
       (g) =>
-        `- [${g.title}](${url}/docs/games/${g.name}): install with \`npx shadcn@latest add ${url}/r/${g.name}.json\``,
+        `- [${g.title}](${url}/docs/games/${g.name}): install with \`npx shadcn@latest add ${siteConfig.registryNamespace}/${g.name}\``,
     )
     .join("\n");
 
@@ -21,13 +21,13 @@ ${siteConfig.name} is a shadcn registry. Each game is a single drop-in React/TSX
 
 ## Install a game
 
-Run, replacing \`snake\` with any game name:
+${siteConfig.name} is listed in the official shadcn registry directory (https://ui.shadcn.com/docs/directory?q=gamekit), so install any game by short name — no setup needed, the CLI resolves the \`${siteConfig.registryNamespace}\` namespace automatically:
 
 \`\`\`bash
-npx shadcn@latest add ${url}/r/snake.json
+npx shadcn@latest add ${siteConfig.registryNamespace}/snake
 \`\`\`
 
-Optionally register the \`${siteConfig.registryNamespace}\` namespace in components.json, then \`npx shadcn@latest add ${siteConfig.registryNamespace}/snake\`.
+Replace \`snake\` with any game name. Optionally run \`npx shadcn@latest registry add ${siteConfig.registryNamespace}\` to pin the registry in your \`components.json\`, or install by direct URL: \`npx shadcn@latest add ${url}/r/snake.json\`.
 
 ## Docs
 

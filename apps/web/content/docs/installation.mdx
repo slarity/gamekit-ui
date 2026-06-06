@@ -5,17 +5,29 @@ description: Install GameKit UI games with the shadcn CLI — by registry URL or
 
 ## Install a game
 
-Add any game by its registry URL:
+GameKit UI is listed in the [official shadcn registry directory](https://ui.shadcn.com/docs/directory?q=gamekit), so install any game by short name — the CLI resolves the `@gamekitui` namespace automatically, no setup required:
+
+```bash
+npx shadcn@latest add @gamekitui/snake
+```
+
+Replace `snake` with any game (`tic-tac-toe`, `2048`, `flappy`, …). The CLI writes the component into your project and rewrites the `cn` import to your own `@/lib/utils` — the only assumption is the standard shadcn helper.
+
+You can also install by direct registry URL if you prefer:
 
 ```bash
 npx shadcn@latest add https://gamekitui.com/r/snake.json
 ```
 
-The CLI writes the component into your project and rewrites the `cn` import to your own `@/lib/utils`. That's the only assumption — the standard shadcn helper.
+## Pin the registry (optional)
 
-## Register the namespace (optional)
+`@gamekitui` installs work straight from the directory, but you can pin the registry in your project config:
 
-Add the `@gamekitui` namespace to your `components.json` to install games by short name:
+```bash
+npx shadcn@latest registry add @gamekitui
+```
+
+Or add it to `components.json` by hand:
 
 ```json
 {
@@ -23,10 +35,6 @@ Add the `@gamekitui` namespace to your `components.json` to install games by sho
     "@gamekitui": "https://gamekitui.com/r/{name}.json"
   }
 }
-```
-
-```bash
-npx shadcn@latest add @gamekitui/snake
 ```
 
 ## Use it

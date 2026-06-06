@@ -12,6 +12,6 @@ Goal: make it trivial for an LLM or coding agent to install and use GameKit UI g
 ## Next steps (when ready to publish)
 
 - **Publish the skill to [skills.sh / clawskills.sh](https://clawskills.sh).** Submit `skills/gamekitui/SKILL.md` so agents can `install` it by name. Keep the install names + game list in sync with `apps/web/src/registry/games.ts`.
-- **Submit to the shadcn registry directory** (PR to `shadcn-ui/ui` `apps/v4/registry/directory.json`) so `@gamekit` appears in `npx shadcn@latest add` discovery.
+- ✅ **Submitted to the shadcn registry directory** — merged into `shadcn-ui/ui` (`apps/v4/registry/directory.json`, PR #10864). `@gamekitui` is discoverable at https://ui.shadcn.com/docs/directory?q=gamekit and installable via `npx shadcn@latest registry add @gamekitui`.
 - **Cross-list** on `registry.directory` and `birobirobiro/awesome-shadcn-ui`.
 - **Keep generators in sync.** `/llms.txt`, `/llms-full.txt`, the skill table, and the structured data all derive (or should derive) from `GAMES` in `apps/web/src/registry/games.ts`; when a game is added, only that file + the registry index need updating, and the LLM surfaces update automatically (the skill table is currently hand-maintained — consider generating it).

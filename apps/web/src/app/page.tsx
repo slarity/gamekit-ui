@@ -182,7 +182,7 @@ export default function Home() {
               <code>
                 <span className="text-muted-foreground">{"// 1 — install\n"}</span>
                 <span className="text-primary">$</span>
-                {" npx shadcn@latest add gamekitui.com/r/snake.json\n\n"}
+                {" npx shadcn@latest add @gamekitui/snake\n\n"}
                 <span className="text-muted-foreground">{"// 2 — use it\n"}</span>
                 <span className="text-arcade-cyan">import</span>
                 {" { "}

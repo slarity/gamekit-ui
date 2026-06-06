@@ -11,6 +11,7 @@ Minimal, themeable React/TSX games installable with the shadcn CLI — perfect f
 
 <p>
   <a href="https://github.com/slarity/gamekit-ui/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-57f2a4.svg" /></a>
+  <a href="https://ui.shadcn.com/docs/directory?q=gamekit"><img alt="shadcn registry directory" src="https://img.shields.io/badge/shadcn-directory-57f2a4.svg" /></a>
   <a href="https://github.com/slarity/gamekit-ui/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/slarity/gamekit-ui?color=57f2a4&logo=github" /></a>
   <img alt="Games" src="https://img.shields.io/badge/games-10-57f2a4.svg" />
   <img alt="Dependencies" src="https://img.shields.io/badge/deps-zero-57f2a4.svg" />
@@ -31,7 +32,7 @@ Minimal, themeable React/TSX games installable with the shadcn CLI — perfect f
 ---
 
 ```bash
-npx shadcn@latest add https://gamekitui.com/r/snake.json
+npx shadcn@latest add @gamekitui/snake
 ```
 
 No provider. No peer deps. No init step. Each game is a single drop-in file that **inherits your shadcn theme** automatically — light/dark and any preset. Drop one on a 404 and it plays on the first keypress.
@@ -47,16 +48,16 @@ No provider. No peer deps. No init step. Each game is a single drop-in file that
 
 | Game | Surface | Install |
 |---|---|---|
-| 🐍 Snake | canvas | `npx shadcn@latest add https://gamekitui.com/r/snake.json` |
-| ⭕ Tic-Tac-Toe | DOM | `npx shadcn@latest add https://gamekitui.com/r/tic-tac-toe.json` |
-| 🔢 2048 | DOM | `npx shadcn@latest add https://gamekitui.com/r/2048.json` |
-| 🃏 Memory Match | DOM | `npx shadcn@latest add https://gamekitui.com/r/memory-match.json` |
-| 🔨 Whack-a-Mole | DOM | `npx shadcn@latest add https://gamekitui.com/r/whack-a-mole.json` |
-| 💣 Minesweeper | DOM | `npx shadcn@latest add https://gamekitui.com/r/minesweeper.json` |
-| 🏓 Pong | canvas | `npx shadcn@latest add https://gamekitui.com/r/pong.json` |
-| 🧱 Breakout | canvas | `npx shadcn@latest add https://gamekitui.com/r/breakout.json` |
-| 🦖 Dino Runner | canvas | `npx shadcn@latest add https://gamekitui.com/r/dino-runner.json` |
-| 🐦 Flappy | canvas | `npx shadcn@latest add https://gamekitui.com/r/flappy.json` |
+| 🐍 Snake | canvas | `npx shadcn@latest add @gamekitui/snake` |
+| ⭕ Tic-Tac-Toe | DOM | `npx shadcn@latest add @gamekitui/tic-tac-toe` |
+| 🔢 2048 | DOM | `npx shadcn@latest add @gamekitui/2048` |
+| 🃏 Memory Match | DOM | `npx shadcn@latest add @gamekitui/memory-match` |
+| 🔨 Whack-a-Mole | DOM | `npx shadcn@latest add @gamekitui/whack-a-mole` |
+| 💣 Minesweeper | DOM | `npx shadcn@latest add @gamekitui/minesweeper` |
+| 🏓 Pong | canvas | `npx shadcn@latest add @gamekitui/pong` |
+| 🧱 Breakout | canvas | `npx shadcn@latest add @gamekitui/breakout` |
+| 🦖 Dino Runner | canvas | `npx shadcn@latest add @gamekitui/dino-runner` |
+| 🐦 Flappy | canvas | `npx shadcn@latest add @gamekitui/flappy` |
 
 > Base registry URL: `https://gamekitui.com/r/{name}.json`
 
@@ -96,21 +97,15 @@ const Snake = dynamic(() => import("@/components/games/snake").then((m) => m.Sna
 });
 ```
 
-### Namespace install (optional)
+### Pin the registry (optional)
 
-Register the `@gamekitui` namespace in your `components.json`:
-
-```jsonc
-{
-  "registries": {
-    "@gamekitui": "https://gamekitui.com/r/{name}.json"
-  }
-}
-```
+`@gamekitui/<game>` installs resolve straight from the [official shadcn registry directory](https://ui.shadcn.com/docs/directory?q=gamekit) — no setup needed. If you'd rather pin the registry in your project config:
 
 ```bash
-npx shadcn@latest add @gamekitui/snake
+npx shadcn@latest registry add @gamekitui
 ```
+
+<sub>Or add `"@gamekitui": "https://gamekitui.com/r/{name}.json"` to the `registries` field of your `components.json` by hand. You can also install any game by its direct URL: `npx shadcn@latest add https://gamekitui.com/r/snake.json`.</sub>
 
 ## ⚙️ Shared props
 

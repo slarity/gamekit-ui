@@ -5,7 +5,7 @@ description: Install and use GameKit UI — drop-in browser games (Snake, Tic-Ta
 
 # GameKit UI
 
-GameKit UI is an open-source **shadcn registry** of minimal, themeable browser games. Each game is a single self-contained React/TSX file installed with the shadcn CLI — no provider, no peer dependency, no init step. Games are zero-asset (drawn with CSS or `<canvas>`), ≤6 KB gzipped, fully responsive, accessible, and inherit the host app's shadcn theme.
+GameKit UI is an open-source **shadcn registry** of minimal, themeable browser games, listed in the official [shadcn registry directory](https://ui.shadcn.com/docs/directory?q=gamekit). Each game is a single self-contained React/TSX file installed with the shadcn CLI — no provider, no peer dependency, no init step. Games are zero-asset (drawn with CSS or `<canvas>`), 2–4 KB minified + gzipped, fully responsive, accessible, and inherit the host app's shadcn theme.
 
 Machine-readable reference: <https://gamekitui.com/llms.txt> and <https://gamekitui.com/llms-full.txt>.
 
@@ -17,11 +17,11 @@ The user wants to drop a playable game into their React app (commonly a 404 page
 
 1. **Verify prerequisites.** The project must be a shadcn/ui project (Tailwind v4, a `cn` helper at `@/lib/utils`, a `components.json`). If not initialized, run `npx shadcn@latest init` first.
 2. **Pick a game** from the list below based on the user's need (e.g. Dino Runner or Snake for a 404; Flappy for a loading screen; Whack-a-Mole/Memory Match for an empty state).
-3. **Install it:**
+3. **Install it** (the `@gamekitui` namespace resolves from the official shadcn directory — no setup needed):
    ```bash
-   npx shadcn@latest add https://gamekitui.com/r/<game>.json
+   npx shadcn@latest add @gamekitui/<game>
    ```
-   This copies a single file to `@/components/games/<game>.tsx` and rewrites the `cn` import to the project's own.
+   This copies a single file to `@/components/games/<game>.tsx` and rewrites the `cn` import to the project's own. (Direct URL also works: `npx shadcn@latest add https://gamekitui.com/r/<game>.json`.)
 4. **Render it.** It fills its container, so wrap it in a sized element:
    ```tsx
    import { Snake } from "@/components/games/snake";
@@ -54,14 +54,18 @@ Note: the `2048` component is exported as `Game2048` (identifiers can't start wi
 
 ## Shared props
 
-`className`, `width` (optional max-width; the game otherwise fills its container), `paused`, `autoFocus`, `persistHighScore`, `onScoreChange`, `onGameOver`, `onStart`.
+`className`, `width` (optional max-width; the game otherwise fills its container), `paused`, `autoFocus`, `captureGlobalKeys` (default `true` — listens for keys on `window` so the game responds without being focused first; set `false` when multiple games share a page), `persistHighScore`, `onScoreChange`, `onGameOver`, `onStart`.
 
-## Namespace install (optional)
+## Pin the registry (optional)
 
-Add to `components.json`:
+`@gamekitui/<game>` installs resolve from the shadcn directory automatically, but you can pin the registry in `components.json` if you prefer it in your project config:
 
-```json
-{ "registries": { "@gamekit": "https://gamekitui.com/r/{name}.json" } }
+```bash
+npx shadcn@latest registry add @gamekitui
 ```
 
-Then: `npx shadcn@latest add @gamekit/snake`.
+Or add it manually:
+
+```json
+{ "registries": { "@gamekitui": "https://gamekitui.com/r/{name}.json" } }
+```

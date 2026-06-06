@@ -1,6 +1,6 @@
 # gamekitui — Product Requirements Document (v1.0)
 
-> An open-source shadcn component registry shipping 10 minimal, drop-in browser games as React/TSX primitives. Installable via the shadcn CLI (`npx shadcn@latest add` by URL or `@gamekit` namespace). Pure craft / open-source project — no backend, no auth, no monetization.
+> An open-source shadcn component registry shipping 10 minimal, drop-in browser games as React/TSX primitives. Installable via the shadcn CLI (`npx shadcn@latest add` by URL or `@gamekitui` namespace). Pure craft / open-source project — no backend, no auth, no monetization.
 
 **Status:** Ready to scaffold. This document is the source of truth handed to the implementer (e.g. Claude Code). Paths, configs, and acceptance criteria are concrete on purpose.
 
@@ -30,8 +30,8 @@
 
 ```bash
 npx shadcn@latest add https://gamekitui.com/r/snake.json
-# or, with the namespace registered in components.json:
-npx shadcn@latest add @gamekit/snake
+# or, with the namespace registered (npx shadcn@latest registry add @gamekitui):
+npx shadcn@latest add @gamekitui/snake
 ```
 
 **Footprint / identity principle.** Every game obeys a hard per-game budget enforced in CI:
@@ -70,10 +70,10 @@ The whole library is "the smallest reasonable game with the cleanest reasonable 
 | Registry catalog URL | `https://gamekitui.com/r/registry.json` |
 | Registry item URL pattern | `https://gamekitui.com/r/{name}.json` |
 | Recommended namespace | **`@gamekit`** (short, distinct from `@gamekitui`, matches shadcn's short-namespace convention like `@v0`, `@shadcn`) |
-| `components.json` snippet a user adds | `{ "registries": { "@gamekit": "https://gamekitui.com/r/{name}.json" } }` |
+| `components.json` snippet a user adds | `{ "registries": { "@gamekitui": "https://gamekitui.com/r/{name}.json" } }` |
 | Install (URL) | `npx shadcn@latest add https://gamekitui.com/r/snake.json` |
-| Install (namespace, after directory listing) | `npx shadcn@latest add @gamekit/snake` |
-| Official directory submission | PR to `shadcn-ui/ui` adding our entry to `apps/v4/registry/directory.json`; run their `validate:registries` script first |
+| Install (namespace) | `npx shadcn@latest registry add @gamekitui` then `npx shadcn@latest add @gamekitui/snake` |
+| Official directory submission | ✅ Merged into `shadcn-ui/ui` (`apps/v4/registry/directory.json`, PR #10864) — listed at https://ui.shadcn.com/docs/directory?q=gamekit |
 
 **Unaffiliated-community-project disclaimer (mandatory in README):**
 
@@ -1081,7 +1081,7 @@ For each: implement `engine.ts` + tests; implement `<Game>.tsx` matching `GamePr
 4. Watch issues for a week; patch against the latest shadcn CLI if anything breaks.
 
 **Acceptance criteria**
-- gamekitui appears under `@gamekit` in the shadcn registry directory.
+- gamekitui appears under `@gamekitui` in the shadcn registry directory.
 - (Stretch) first external contributor PR within 14 days.
 
 ---
