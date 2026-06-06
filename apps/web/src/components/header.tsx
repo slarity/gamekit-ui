@@ -10,11 +10,12 @@ import {
   SheetTrigger,
 } from "@gamekitui/ui/components/sheet";
 import { cn } from "@gamekitui/ui/lib/utils";
-import { Github, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BrandWordmark } from "@/components/brand-wordmark";
+import { GitHubStars } from "@/components/github-stars";
 
 const NAV = [
   { href: "/docs", label: "Docs" },
@@ -55,16 +56,8 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1">
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub repository"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-muted-foreground")}
-          >
-            <Github className="size-4" />
-          </a>
+        <div className="ml-auto flex items-center gap-1.5">
+          <GitHubStars />
 
           {/* Mobile menu */}
           <Sheet>

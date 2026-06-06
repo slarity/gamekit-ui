@@ -15,8 +15,9 @@ export function SiteFooter() {
             Tiny, themeable browser games for shadcn. 2–4&nbsp;KB gzipped, zero external assets.
           </p>
         </div>
-        <div className="flex gap-8 font-mono text-sm">
-          <div className="flex flex-col gap-2">
+        <div className="flex gap-10 font-mono text-sm sm:gap-16">
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[11px] text-muted-foreground/60 uppercase tracking-[0.18em]">Explore</p>
             <Link href="/games" className="text-muted-foreground hover:text-primary">
               Games
             </Link>
@@ -30,6 +31,30 @@ export function SiteFooter() {
               className="text-muted-foreground hover:text-primary"
             >
               GitHub
+            </a>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[11px] text-muted-foreground/60 uppercase tracking-[0.18em]">
+              For agents
+            </p>
+            <a href="/llms.txt" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary">
+              llms.txt
+            </a>
+            <a
+              href="/llms-full.txt"
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-primary"
+            >
+              llms-full.txt
+            </a>
+            <a
+              href={`${siteConfig.github}/blob/main/skills/gamekitui/SKILL.md`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground hover:text-primary"
+            >
+              Agent skill
             </a>
           </div>
         </div>
