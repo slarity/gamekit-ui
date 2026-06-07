@@ -62,20 +62,47 @@ function minimax(board: Board, player: Player, depth: number): number {
   return best;
 }
 
-function bestMove(board: Board): number {
-  let best = -Infinity;
-  let move = -1;
+/**
+ * Chance the CPU plays a random legal move instead of the optimal one.
+ * Keeps the game beatable for a human ("medium" difficulty) while still
+ * usually blocking and taking wins.
+ */
+const CPU_RANDOM_MOVE_CHANCE = 0.35;
+
+function legalMoves(board: Board): number[] {
+  const moves: number[] = [];
   for (let i = 0; i < 9; i++) {
-    if (board[i] !== null) continue;
+    if (board[i] === null) moves.push(i);
+  }
+  return moves;
+}
+
+function bestMove(board: Board): number {
+  const legal = legalMoves(board);
+  if (legal.length === 0) return -1;
+
+  // Imperfection: sometimes the CPU just plays a random legal move so a human
+  // can win. Uses Math.random — the AI does not need to be reproducible.
+  if (Math.random() < CPU_RANDOM_MOVE_CHANCE) {
+    return legal[Math.floor(Math.random() * legal.length)]!;
+  }
+
+  // Otherwise play optimally, but pick RANDOMLY among all equally-best moves so
+  // the opening (and any tie) varies instead of always taking the first cell.
+  let best = -Infinity;
+  let bestMoves: number[] = [];
+  for (const i of legal) {
     const copy = board.slice() as Board;
     copy[i] = "O";
     const score = minimax(copy, "X", 0);
     if (score > best) {
       best = score;
-      move = i;
+      bestMoves = [i];
+    } else if (score === best) {
+      bestMoves.push(i);
     }
   }
-  return move;
+  return bestMoves[Math.floor(Math.random() * bestMoves.length)]!;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -395,7 +422,7 @@ export function TicTacToe({
               {!started ? (
                 <>
                   <p className="font-semibold text-lg">Tic-Tac-Toe</p>
-                  <p className="text-muted-foreground text-sm">You play X. CPU is unbeatable.</p>
+                  <p className="text-muted-foreground text-sm">You play X. Beat the CPU.</p>
                 </>
               ) : winResult ? (
                 <>

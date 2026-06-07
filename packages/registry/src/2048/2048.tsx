@@ -450,37 +450,65 @@ export function Game2048({
     };
   }, [startGame, move, captureGlobalKeys]);
 
-  // Touch swipe (same approach as snake.tsx).
+  // Touch swipe. A single deliberate swipe should cause AT MOST one move: we
+  // only register a direction on touchend (never on touchmove), so drag-holds
+  // and circular drags that return near the origin don't move anything.
   React.useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
+    // Minimum net travel for a swipe to count.
+    const THRESHOLD = 24;
+    // Dominant axis must clearly win (1.3×) for a diagonal-ish swipe to register.
+    const DOMINANCE = 1.3;
     let sx = 0;
     let sy = 0;
+    let active = false;
     const onTouchStart = (e: TouchEvent) => {
       const t = e.touches[0];
       if (!t) return;
       sx = t.clientX;
       sy = t.clientY;
+      active = true;
       if (statusRef.current === "idle") startGame();
     };
     const onTouchMove = (e: TouchEvent) => {
+      // Don't move tiles here — only prevent the page from scrolling while the
+      // gesture is over the board.
+      if (active) e.preventDefault();
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!active) return;
+      active = false;
       const t = e.changedTouches[0];
       if (!t) return;
       const dx = t.clientX - sx;
       const dy = t.clientY - sy;
-      if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
-      const dir: Dir =
-        Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      // Too short — treat as a tap / drag-hold, not a swipe.
+      if (Math.max(adx, ady) < THRESHOLD) return;
+      // One axis must clearly dominate; otherwise the gesture is ambiguous.
+      const horizontal = adx >= ady;
+      if (horizontal && adx < ady * DOMINANCE) return;
+      if (!horizontal && ady < adx * DOMINANCE) return;
+      const dir: Dir = horizontal
+        ? dx > 0
+          ? "right"
+          : "left"
+        : dy > 0
+          ? "down"
+          : "up";
       move(dir);
-      sx = t.clientX;
-      sy = t.clientY;
-      e.preventDefault();
     };
     el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
     return () => {
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
     };
   }, [startGame, move]);
 

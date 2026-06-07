@@ -455,14 +455,23 @@ export function Breakout({
         vy = -Math.abs(currSpeed * Math.cos(angle));
       }
 
-      // Brick collisions.
+      // Brick collisions. Resolve at most ONE brick hit per step: find the first
+      // alive brick the ball overlaps, reflect the correct axis (minimal-penetration
+      // resolution), push the ball out of the brick, destroy it, then stop. This
+      // prevents the ball from tunnelling through (and flattening) a whole column
+      // of bricks in a single frame.
       const { topMargin, sideMargin, brickW, brickH } = getBrickLayout();
       let scoreGain = 0;
       let bricksRemaining = 0;
+      let hitBrick: Brick | null = null;
+      let hitBx = 0;
+      let hitBy = 0;
 
       for (const brick of gs.bricks) {
         if (!brick.alive) continue;
         bricksRemaining++;
+        if (hitBrick) continue; // already found this step's collision; just keep counting
+
         const bx = sideMargin + brick.col * (brickW + BRICK_GAP);
         const by = topMargin + brick.row * (brickH + BRICK_GAP);
 
@@ -474,18 +483,36 @@ export function Breakout({
         const distSq = distX ** 2 + distY ** 2;
 
         if (distSq < BALL_RADIUS ** 2) {
-          brick.alive = false;
-          bricksRemaining--;
-          scoreGain += POINTS_PER_BRICK;
+          hitBrick = brick;
+          hitBx = bx;
+          hitBy = by;
+        }
+      }
 
-          // Reflect based on collision side.
-          const overlapX = Math.abs(distX);
-          const overlapY = Math.abs(distY);
-          if (overlapX < overlapY) {
-            vx = -vx;
-          } else {
-            vy = -vy;
-          }
+      if (hitBrick) {
+        hitBrick.alive = false;
+        bricksRemaining--;
+        scoreGain += POINTS_PER_BRICK;
+
+        // Pick the reflection axis by minimal penetration. Compare how far the ball
+        // has entered the brick on each axis (using its expanded AABB by BALL_RADIUS);
+        // reflect whichever axis the ball is shallowest in, which corresponds to the
+        // side it actually crossed.
+        const penLeft = nx + BALL_RADIUS - hitBx; // entering from the left edge
+        const penRight = hitBx + brickW + BALL_RADIUS - nx; // from the right edge
+        const penTop = ny + BALL_RADIUS - hitBy; // from the top edge
+        const penBottom = hitBy + brickH + BALL_RADIUS - ny; // from the bottom edge
+        const penX = Math.min(penLeft, penRight);
+        const penY = Math.min(penTop, penBottom);
+
+        if (penX < penY) {
+          // Horizontal hit — reflect vx and push the ball clear on the x axis.
+          vx = penLeft < penRight ? -Math.abs(vx) : Math.abs(vx);
+          nx = penLeft < penRight ? hitBx - BALL_RADIUS : hitBx + brickW + BALL_RADIUS;
+        } else {
+          // Vertical hit — reflect vy and push the ball clear on the y axis.
+          vy = penTop < penBottom ? -Math.abs(vy) : Math.abs(vy);
+          ny = penTop < penBottom ? hitBy - BALL_RADIUS : hitBy + brickH + BALL_RADIUS;
         }
       }
 

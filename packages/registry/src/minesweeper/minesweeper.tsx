@@ -148,6 +148,52 @@ function floodReveal(grid: Grid, startR: number, startC: number): Grid {
   return newGrid;
 }
 
+/**
+ * Chord (a.k.a. "double-click") reveal: activating an already-revealed numbered
+ * cell whose flagged-neighbor count equals its number reveals all of its
+ * non-flagged neighbors. Reuses floodReveal so empty cells cascade as usual and
+ * mines stay flagged. Returns the new grid plus whether a mine got revealed
+ * (the player flagged wrong → loss, handled by the caller exactly like a normal
+ * mine reveal). When the chord conditions aren't met, the grid is returned
+ * unchanged.
+ */
+function chordReveal(grid: Grid, r: number, c: number): { grid: Grid; hitMine: boolean } {
+  const row = grid[r];
+  if (row === undefined) return { grid, hitMine: false };
+  const cell = row[c];
+  if (cell === undefined || !cell.revealed || cell.mine || cell.adjacentMines === 0) {
+    return { grid, hitMine: false };
+  }
+
+  const neighbors = getNeighbors(r, c);
+  let flaggedCount = 0;
+  for (const [nr, nc] of neighbors) {
+    const nrow = grid[nr];
+    if (nrow === undefined) continue;
+    const ncell = nrow[nc];
+    if (ncell === undefined) continue;
+    if (ncell.flagged) flaggedCount++;
+  }
+
+  // Only chord when the flag count matches the number (standard behavior).
+  if (flaggedCount !== cell.adjacentMines) return { grid, hitMine: false };
+
+  let workGrid = grid;
+  let hitMine = false;
+  for (const [nr, nc] of neighbors) {
+    const nrow = workGrid[nr];
+    if (nrow === undefined) continue;
+    const ncell = nrow[nc];
+    if (ncell === undefined) continue;
+    if (ncell.flagged || ncell.revealed) continue;
+    if (ncell.mine) hitMine = true;
+    // Reuse the normal flood logic so "0" cells cascade as usual.
+    workGrid = floodReveal(workGrid, nr, nc);
+  }
+
+  return { grid: workGrid, hitMine };
+}
+
 function revealAllMines(grid: Grid): Grid {
   return grid.map((row) =>
     row.map((cell) => (cell.mine ? { ...cell, revealed: true } : { ...cell })),
@@ -356,7 +402,38 @@ export function Minesweeper({
         if (row === undefined) return prev;
         const cell = row[c];
         if (cell === undefined) return prev;
-        if (cell.revealed || cell.flagged) return prev;
+
+        // Chord: activating an already-revealed number reveals its non-flagged
+        // neighbors when the flag count matches. Only meaningful while playing.
+        if (cell.revealed) {
+          if (cell.mine || cell.adjacentMines === 0) return prev;
+          if (statusRef.current !== "playing") return prev;
+
+          const { grid: chorded, hitMine } = chordReveal(prev, r, c);
+          if (chorded === prev) return prev; // conditions not met → no-op
+
+          if (hitMine) {
+            const revealed = revealAllMines(chorded);
+            stopTimer();
+            setStatus("lost");
+            onGameOver?.({ score: elapsed, won: false });
+            onScoreChange?.(elapsed);
+            return revealed;
+          }
+
+          if (checkWin(chorded)) {
+            stopTimer();
+            setStatus("won");
+            saveBestTime(elapsed);
+            onGameOver?.({ score: elapsed, won: true });
+            onScoreChange?.(elapsed);
+            return chorded;
+          }
+
+          return chorded;
+        }
+
+        if (cell.flagged) return prev;
 
         let workGrid = prev;
 
@@ -607,9 +684,19 @@ export function Minesweeper({
                         : "Hidden cell"
                   }
                   aria-pressed={cell.flagged}
-                  disabled={cell.revealed || isGameOver}
+                  // Revealed numbered cells stay enabled so they can be
+                  // chorded; revealed empties/mines and game-over disable.
+                  disabled={
+                    isGameOver ||
+                    (cell.revealed && (cell.mine || cell.adjacentMines === 0))
+                  }
                   onClick={() => {
-                    if (!cell.revealed && !cell.flagged) {
+                    if (cell.revealed) {
+                      // Chord on a revealed number.
+                      if (!cell.mine && cell.adjacentMines > 0) {
+                        handleCellReveal(r, c);
+                      }
+                    } else if (!cell.flagged) {
                       handleCellReveal(r, c);
                     }
                   }}
@@ -626,8 +713,11 @@ export function Minesweeper({
                     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring",
                     // Revealed mine (loss) → destructive
                     cell.revealed && cell.mine && "bg-destructive text-destructive-foreground",
-                    // Revealed safe cell → background
-                    cell.revealed && !cell.mine && "bg-background cursor-default",
+                    // Revealed safe cell → background. Numbered cells stay
+                    // clickable (chord), empties are inert.
+                    cell.revealed && !cell.mine && "bg-background",
+                    cell.revealed && !cell.mine && cell.adjacentMines === 0 && "cursor-default",
+                    cell.revealed && !cell.mine && cell.adjacentMines > 0 && !isGameOver && "cursor-pointer",
                     // Covered, flagged
                     !cell.revealed && cell.flagged && "bg-secondary text-secondary-foreground",
                     // Covered, not flagged, hoverable

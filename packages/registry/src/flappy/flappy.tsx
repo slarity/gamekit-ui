@@ -230,9 +230,12 @@ export function Flappy({
     // Spawn first pipe just off right edge
     const firstPipeX = LOGW + PIPE_SPACING * 0.5;
     const gapY = LOGH * 0.4 + Math.random() * (LOGH * 0.25);
+    // Begin mid-flap: give the bird a gentle upward velocity (0.8× a full flap)
+    // so it rises briefly instead of dropping under gravity immediately.
+    const startVY = (reduceRef.current ? FLAP_VY_REDUCED : FLAP_VY) * 0.8;
     liveRef.current = {
       birdY: LOGH / 2,
-      birdVY: 0,
+      birdVY: startVY,
       pipes: [{ x: firstPipeX, gapY, scored: false }],
       score: 0,
       blipAlpha: 0,
