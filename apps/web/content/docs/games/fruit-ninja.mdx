@@ -1,0 +1,28 @@
+---
+title: Fruit Ninja
+description: Swipe to slice the flying fruit, dodge the bombs. A juicy arcade game.
+---
+
+Swipe to slice the flying fruit, dodge the bombs. A juicy 60-second arcade run.
+
+<ComponentPreview name="fruit-ninja" />
+
+<GameInfo name="fruit-ninja" />
+
+A 60-second score attack: slice as much fruit as you can, chain combos for bonus points, and avoid the bombs — a bomb costs points and breaks your combo, but missing fruit never ends the run. The clock does.
+
+## Theming
+
+This is a canvas game. The blade trail and combo popups use your shadcn `--primary` token and bombs use `--destructive` — read at runtime and re-resolved when you toggle dark mode or swap a theme preset. The fruit themselves use a fixed, vibrant palette so they always pop against any background. Try the **Customize** button in the corner.
+
+## Install
+
+```bash
+npx shadcn@latest add @gamekitui/fruit-ninja
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<FruitNinja className="mx-auto w-full max-w-sm" />
+```

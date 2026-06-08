@@ -19,6 +19,7 @@ export const GameIndex: Record<string, LazyGame> = {
   breakout: React.lazy(() => import("@gamekitui/registry/breakout/breakout")),
   "dino-runner": React.lazy(() => import("@gamekitui/registry/dino-runner/dino-runner")),
   flappy: React.lazy(() => import("@gamekitui/registry/flappy/flappy")),
+  "fruit-ninja": React.lazy(() => import("@gamekitui/registry/fruit-ninja/fruit-ninja")),
 };
 
 export function hasPlayable(name: string): boolean {

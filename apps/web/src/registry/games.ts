@@ -143,6 +143,17 @@ export const GAMES: GameMeta[] = [
     controls: { keyboard: true, mouse: true, touch: true, help: "Space, Up, click, or tap to flap." },
     ready: true,
   },
+  {
+    name: "fruit-ninja",
+    title: "Fruit Ninja",
+    description: "Slice the flying fruit, dodge the bombs, beat the clock. A juicy 60-second arcade run.",
+    surface: "canvas",
+    iframeHeight: "620px",
+    files: [{ path: "packages/registry/src/fruit-ninja/fruit-ninja.tsx", target: "@/components/games/fruit-ninja.tsx" }],
+    platforms: { desktop: true, mobile: true },
+    controls: { keyboard: false, mouse: true, touch: true, help: "Drag or swipe the blade across the fruit to slice it. Bombs cost points — avoid them. Press Enter to start. 60-second arcade run." },
+    ready: true,
+  },
 ];
 
 export const getGame = (name: string) => GAMES.find((g) => g.name === name);
