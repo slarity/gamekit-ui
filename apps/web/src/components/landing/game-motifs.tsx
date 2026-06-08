@@ -113,6 +113,16 @@ export function GameMotif({ name }: { name: string }) {
         </div>
       );
 
+    case "fruit-ninja":
+      return (
+        <div className="m-fruit" aria-hidden="true">
+          <i className="f1" />
+          <i className="f2" />
+          <i className="f3" />
+          <span className="blade" />
+        </div>
+      );
+
     default:
       return null;
   }

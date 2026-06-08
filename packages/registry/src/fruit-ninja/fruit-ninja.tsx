@@ -609,6 +609,7 @@ export function FruitNinja({
       }
 
       // Two halves fly apart along the blade's perpendicular.
+      const fd = FRUITS[f.def]!;
       const cut = Math.atan2(by - ay, bx - ax);
       const px = Math.cos(cut + Math.PI / 2);
       const py = Math.sin(cut + Math.PI / 2);
@@ -620,7 +621,8 @@ export function FruitNinja({
           vx: f.vx * 0.4 + px * kick * side,
           vy: f.vy * 0.4 + py * kick * side - 40,
           r: f.r,
-          color: f.color,
+          rind: fd.rind,
+          flesh: fd.flesh,
           rot: f.rot,
           vrot: f.vrot + side * rand(1, 4),
           cut,
@@ -628,7 +630,7 @@ export function FruitNinja({
           life: 0,
         });
       }
-      spawnJuice(gs, f, f.color, reduceRef.current ? 5 : 12);
+      spawnJuice(gs, f, fd.flesh, reduceRef.current ? 5 : 12);
     };
 
     // Slice every unsliced fruit the blade segment passes through.
@@ -685,7 +687,8 @@ export function FruitNinja({
         f.y += f.vy * dt;
         f.rot += f.vrot * dt;
       }
-      gs.fruits = gs.fruits.filter((f) => !(f.y - f.r > LOGH && f.vy > 0));
+      // Drop sliced fruit (halves take over) and any that fell off the bottom.
+      gs.fruits = gs.fruits.filter((f) => !f.sliced && !(f.y - f.r > LOGH && f.vy > 0));
 
       // Halves.
       for (const h of gs.halves) {
@@ -729,6 +732,9 @@ export function FruitNinja({
       ctx.arc(0, 0, f.r, 0, Math.PI * 2);
       ctx.fill();
 
+      // Per-fruit signature detail (stripes, leaf, stem…).
+      if (f.kind === "fruit") FRUITS[f.def]!.draw(ctx, f.r);
+
       if (f.kind === "bomb") {
         // Danger ring + fuse make bombs read clearly on any theme.
         const danger = themeRef.current.destructive || "#ef4444";
@@ -768,19 +774,18 @@ export function FruitNinja({
       ctx.translate(h.x, h.y);
       ctx.rotate(h.rot);
       ctx.globalAlpha = alpha;
-      // Flat edge aligned with the cut.
-      ctx.fillStyle = h.color;
+      // Exposed flesh fills the half disc; flat edge aligned with the cut.
+      ctx.fillStyle = h.flesh;
       ctx.beginPath();
       ctx.arc(0, 0, h.r, h.cut, h.cut + Math.PI);
       ctx.closePath();
       ctx.fill();
-      // Inner cut face (lighter).
-      ctx.globalAlpha = alpha * 0.5;
-      ctx.fillStyle = "#ffffff";
+      // Skin around the curved edge.
+      ctx.strokeStyle = h.rind;
+      ctx.lineWidth = h.r * 0.2;
       ctx.beginPath();
-      ctx.arc(0, 0, h.r * 0.7, h.cut, h.cut + Math.PI);
-      ctx.closePath();
-      ctx.fill();
+      ctx.arc(0, 0, h.r - h.r * 0.1, h.cut, h.cut + Math.PI);
+      ctx.stroke();
       ctx.globalAlpha = 1;
       ctx.restore();
     };
@@ -836,7 +841,10 @@ export function FruitNinja({
       ctx.globalAlpha = 1;
 
       for (const h of gs.halves) drawHalf(h);
-      for (const f of gs.fruits) drawFruit(f);
+      for (const f of gs.fruits) {
+        if (f.sliced) continue; // halves replace it the same frame
+        drawFruit(f);
+      }
 
       for (const tx of gs.texts) {
         const a = Math.max(0, 1 - tx.life / tx.maxLife);
