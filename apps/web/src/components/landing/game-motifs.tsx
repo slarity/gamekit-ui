@@ -123,6 +123,16 @@ export function GameMotif({ name }: { name: string }) {
         </div>
       );
 
+    case "stack":
+      return (
+        <div className="m-stack" aria-hidden="true">
+          <span className="active" />
+          <span />
+          <span />
+          <span />
+        </div>
+      );
+
     default:
       return null;
   }

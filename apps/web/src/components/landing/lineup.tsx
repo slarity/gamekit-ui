@@ -17,7 +17,7 @@ export function Lineup() {
       <div className="mt-5 flex items-end justify-between gap-5">
         <div>
           <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">
-            Ten classics, themed to your app.
+            Twelve classics, themed to your app.
           </h2>
           <p className="mt-2 text-muted-foreground text-sm">
             Canvas or DOM, all 2–4&nbsp;KB gzipped. Install one, or grab the whole cabinet.
