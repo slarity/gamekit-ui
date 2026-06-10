@@ -12,6 +12,7 @@ import MemoryMatch from "./src/memory-match/memory-match";
 import Minesweeper from "./src/minesweeper/minesweeper";
 import Pong from "./src/pong/pong";
 import Snake from "./src/snake/snake";
+import StackGame from "./src/stack/stack";
 import TicTacToe from "./src/tic-tac-toe/tic-tac-toe";
 import WhackAMole from "./src/whack-a-mole/whack-a-mole";
 
@@ -27,6 +28,7 @@ const games: [string, React.ComponentType<Record<string, unknown>>][] = [
   ["dino-runner", DinoRunner],
   ["flappy", Flappy],
   ["fruit-ninja", FruitNinja],
+  ["stack", StackGame],
 ];
 
 let failed = 0;
@@ -40,5 +42,5 @@ for (const [name, Comp] of games) {
     console.log(`✗ ${name}: ${(err as Error).message}`);
   }
 }
-console.log(failed === 0 ? "\nAll 11 games render without throwing." : `\n${failed} game(s) failed.`);
+console.log(failed === 0 ? `\nAll ${games.length} games render without throwing.` : `\n${failed} game(s) failed.`);
 process.exit(failed === 0 ? 0 : 1);

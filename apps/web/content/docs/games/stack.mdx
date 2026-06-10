@@ -1,0 +1,28 @@
+---
+title: Stack
+description: The one-tap tower builder. Drop the sliding block, keep the overlap, stack high.
+---
+
+Tap to drop the sliding block. Whatever hangs over the edge shears off — land flush to keep your size, and perfect streaks grow the block back. One input, zero instructions.
+
+<ComponentPreview name="stack" />
+
+<GameInfo name="stack" />
+
+Blocks slide alternately along two axes of an isometric tower, speeding up as you climb. The overhang is sliced off on every imperfect drop, so the footprint shrinks until a clean miss topples the run. Land within a hair of flush for a **perfect** — no shrink, a ring flash, and a streak of three or more regrows the block toward its original size.
+
+## Theming
+
+This is a canvas game, and it's the most theme-coupled one in the kit: **every layer is a shade of your palette**. The tower derives its colors from your shadcn `--primary` token — the hue drifts gently as the tower climbs while the lightness rolls in a wave, so a tall run becomes a gradient of your brand color. Colors re-resolve live, so swapping presets in the **Customize** panel repaints the whole tower mid-game.
+
+## Install
+
+```bash
+npx shadcn@latest add @gamekitui/stack
+```
+
+The game ships as a single drop-in file. It fills its container, so wrap it in any sized element:
+
+```tsx
+<Stack className="mx-auto w-full max-w-sm" />
+```

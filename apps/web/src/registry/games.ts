@@ -154,6 +154,23 @@ export const GAMES: GameMeta[] = [
     controls: { keyboard: false, mouse: true, touch: true, help: "Drag or swipe the blade across the fruit to slice it. Bombs cost points — avoid them. Press Enter to start. 60-second arcade run." },
     ready: true,
   },
+  {
+    name: "stack",
+    title: "Stack",
+    description:
+      "The one-tap tower builder. Drop the sliding block, keep the overlap, stack as high as you can — every layer a shade of your theme.",
+    surface: "canvas",
+    iframeHeight: "620px",
+    files: [{ path: "packages/registry/src/stack/stack.tsx", target: "@/components/games/stack.tsx" }],
+    platforms: { desktop: true, mobile: true },
+    controls: {
+      keyboard: true,
+      mouse: true,
+      touch: true,
+      help: "Tap, click, or press Space / Enter / Up to drop the block. Land it flush for a perfect — streaks of 3+ grow the block back.",
+    },
+    ready: true,
+  },
 ];
 
 export const getGame = (name: string) => GAMES.find((g) => g.name === name);
